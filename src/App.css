@@ -14,14 +14,63 @@ body, html {
 .landing-page {
   min-height: 100vh;
   width: 100%;
-  background-image: url('/images/backgrooundTwirl.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: #4524CC; /* Purple background color */
+  /* Background properties removed as they're now handled in the React component */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Background container and SVG */
+.background-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none; /* Ensure clicks pass through to elements below */
+}
+
+.background-svg {
+  position: absolute;
+  top: -15%;
+  left: -15%; /* Move further left to align more to the left side */
+  width: 85%; /* Slightly larger width */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: contain; /* Ensure the entire image is visible */
+  opacity: 0.7; /* Slightly adjusted opacity */
+  filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
+  image-rendering: -webkit-optimize-contrast; /* Improve image rendering in webkit browsers */
+  image-rendering: crisp-edges; /* Improve image rendering in other browsers */
+  transform-origin: top left; /* Set transform origin to top left */
+  transform: rotate(-5deg); /* Slight rotation for visual interest */
+  mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
+}
+
+/* Define floating animation for background */
+@keyframes float {
+  0% {
+    transform: rotate(-5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-3deg) translateY(-10px);
+  }
+  100% {
+    transform: rotate(-5deg) translateY(0);
+  }
+}
+
+/* Only apply the animation and left positioning on larger screens */
+@media (min-width: 769px) {
+  .background-svg {
+    animation: float 15s ease-in-out infinite;
+    left: -15%; /* Position more to the left on desktop */
+    width: 100%; /* Larger width to ensure it covers enough area */
+  }
 }
 
 /* Content container */
@@ -31,31 +80,76 @@ body, html {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  margin-top: 5vh;
+  margin-top: 10vh; /* Increased top margin for better spacing */
   flex: 1;
+  position: relative;
+  z-index: 1; /* Ensure content appears above background */
+  width: 100%;
+  max-width: 1200px; /* Limit maximum width for larger screens */
+  margin-left: auto;
+  margin-right: auto;
+  overflow: visible; /* Ensure content can overflow container if needed */
+}
+
+/* Adjust content positioning for mobile */
+@media (max-width: 768px) {
+  .content {
+    margin-top: 5vh; /* Less top margin on mobile */
+    padding: 1.5rem;
+  }
+  
+  .logo-container {
+    margin-bottom: 2rem; /* Reduced margin on mobile */
+  }
+  
+  .subtitle {
+    margin-top: 1rem; /* Less top margin on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    margin-top: 2vh; /* Even less top margin on small mobile */
+    padding: 1rem;
+  }
+  
+  .logo-container {
+    margin-bottom: 1.5rem; /* Further reduced margin on small mobile */
+  }
+  
+  .subtitle {
+    margin-top: 0.5rem; /* Less top margin on small mobile */
+  }
 }
 
 /* Logo styling */
 .logo-container {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem; /* Increased from 2rem */
   width: 100%;
   display: flex;
   justify-content: center;
+  padding: 1rem; /* Added padding */
+  overflow: visible; /* Ensure logo can overflow container if needed */
 }
 
 .logo {
-  max-width: 200px;
+  width: 90vw; /* 90% of viewport width */
+  max-width: 1000px; /* Maximum width */
   height: auto;
+  transform-style: preserve-3d; /* Enable 3D transformations */
+  transition: transform 0.5s;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3)); /* Add shadow for depth */
 }
 
 /* Subtitle styling */
 .subtitle {
   font-size: 2rem;
   font-weight: bold;
-  color: #ffffff;
+  color: #ffffff; /* White text for better contrast on purple */
   text-align: center;
+  margin-top: 2rem; /* Added top margin */
   margin-bottom: 2rem;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Form styling */
@@ -79,8 +173,8 @@ body, html {
 .signup-button {
   padding: 1rem;
   font-size: 1rem;
-  background-color: #4CAF50;
-  color: white;
+  background-color: #ffffff; /* White button */
+  color: #4524CC; /* Purple text to match background */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -88,16 +182,18 @@ body, html {
 }
 
 .signup-button:hover {
-  background-color: #45a049;
+  background-color: #f0f0f0; /* Slightly darker white on hover */
 }
 
 /* Footer styling */
 .footer {
   width: 100%;
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent black */
   color: white;
   text-align: center;
+  position: relative;
+  z-index: 1; /* Ensure footer appears above background */
 }
 
 .footer-links {
@@ -112,14 +208,18 @@ body, html {
   text-decoration: none;
   margin: 0 0.5rem;
   font-size: 0.9rem;
+  opacity: 0.8; /* Slightly transparent text */
+  transition: opacity 0.3s;
 }
 
 .footer-link:hover {
   text-decoration: underline;
+  opacity: 1; /* Full opacity on hover */
 }
 
 .separator {
   margin: 0 0.5rem;
+  opacity: 0.5; /* More transparent separator */
 }
 
 /* Responsive design */
@@ -128,12 +228,21 @@ body, html {
     font-size: 1.5rem;
   }
   
-  .logo {
-    max-width: 150px;
-  }
-  
   .signup-form {
     max-width: 90%;
+  }
+  
+  .background-svg {
+    width: 100%; /* Full width on tablets */
+    height: 100%; /* Full height on tablets */
+    object-fit: cover; /* Cover the entire background */
+    top: 0;
+    left: 0; /* Reset left position for mobile */
+    transform: none; /* Remove rotation */
+    animation: none; /* Remove animation */
+    opacity: 0.5; /* Adjusted opacity for better content visibility */
+    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
+    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
   }
 }
 
@@ -142,8 +251,8 @@ body, html {
     font-size: 1.2rem;
   }
   
-  .logo {
-    max-width: 120px;
+  .signup-form {
+    max-width: 90%;
   }
   
   .email-input, .signup-button {
@@ -153,5 +262,61 @@ body, html {
   
   .footer-link {
     font-size: 0.8rem;
+  }
+  
+  .background-svg {
+    width: 100%; /* Full width on mobile */
+    height: 100%; /* Full height on mobile */
+    object-fit: cover; /* Cover the entire background */
+    opacity: 0.4; /* Adjusted opacity for mobile */
+    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
+    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
+  }
+}
+
+/* Desktop and mobile background images */
+.desktop-bg {
+  display: block; /* Show on desktop */
+  left: -15% !important; /* Position more to the left on desktop */
+  width: 100% !important; /* Larger width to ensure it covers enough area */
+}
+
+.mobile-bg {
+  display: none; /* Hide on desktop */
+}
+
+/* Media query for tablets and mobile */
+@media (max-width: 768px) {
+  .desktop-bg {
+    display: none; /* Hide on mobile */
+  }
+  
+  .mobile-bg {
+    display: block; /* Show on mobile */
+  }
+}
+
+/* Media query for mobile phones */
+@media (max-width: 480px) {
+  .subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .email-input, .signup-button {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .footer-link {
+    font-size: 0.8rem;
+  }
+  
+  .background-svg {
+    width: 100%; /* Full width on mobile */
+    height: 100%; /* Full height on mobile */
+    object-fit: cover; /* Cover the entire background */
+    opacity: 0.4; /* Adjusted opacity for mobile */
+    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
+    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
   }
 }

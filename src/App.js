@@ -18,9 +18,35 @@ function App() {
 
   return (
     <div className="landing-page">
+      {/* Background images for different devices */}
+      <div className="background-container">
+        {/* SVG for desktop */}
+        <img 
+          src={process.env.PUBLIC_URL + '/images/twirlWhite.svg'} 
+          alt="Background" 
+          className="background-svg desktop-bg" 
+          style={{ left: '-15%', width: '100%' }}
+        />
+        {/* Also using SVG for mobile to maintain color consistency */}
+        <img 
+          src={process.env.PUBLIC_URL + '/images/twirlWhite.svg'} 
+          alt="Background" 
+          className="background-svg mobile-bg" 
+        />
+      </div>
+      
       <div className="content">
         <div className="logo-container">
-          <img src="/images/logo.png" alt="Logo" className="logo" />
+          <img 
+            src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
+            alt="Logo" 
+            className="logo" 
+            style={{ 
+              width: '90vw', 
+              maxWidth: '1000px', 
+              minWidth: 'auto' 
+            }}
+          />
         </div>
         
         <h2 className="subtitle">Stick to your workouts, always.</h2>
