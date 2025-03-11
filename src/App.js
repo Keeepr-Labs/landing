@@ -68,7 +68,7 @@ function App() {
       
       <footer className="footer">
         <div className="footer-links">
-          <a href="/terms" className="footer-link">Terms and Conditions</a>
+          <a href="/terms" className="footer-link">Terms and Conditionss</a>
           <span className="separator">|</span>
           <a href="/privacy" className="footer-link">Privacy Policy</a>
         </div>
