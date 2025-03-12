@@ -18,14 +18,16 @@ function App() {
 
   return (
     <div className="landing-page">
-      {/* Background images for different devices */}
+      {/* Animated gradient background - moved to top of component */}
+      {/* Gradient is now applied directly to the landing-page element */}
+      
+      {/* Background SVG as a positioned element */}
       <div className="background-container">
         {/* SVG for desktop */}
         <img 
           src={process.env.PUBLIC_URL + '/images/twirlWhite.svg'} 
           alt="Background" 
           className="background-svg desktop-bg" 
-          style={{ left: '-15%', width: '100%' }}
         />
         {/* Also using SVG for mobile to maintain color consistency */}
         <img 
@@ -36,41 +38,46 @@ function App() {
       </div>
       
       <div className="content">
-        <div className="logo-container">
-          <img 
-            src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
-            alt="Logo" 
-            className="logo" 
-            style={{ 
-              width: '90vw', 
-              maxWidth: '1000px', 
-              minWidth: 'auto' 
-            }}
-          />
+        {/* Initial viewport - what's visible on first load */}
+        <div className="initial-viewport">
+          <div className="logo-container">
+            <img 
+              src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
+              alt="Logo" 
+              className="logo" 
+            />
+          </div>
+          
+          <h2 className="subtitle overline-semibold">Stick to your workouts, always</h2>
+          
+          <p className="subtitle-text body-one-regular">
+            No AI magic - just accountability. A group chat with friends, your goals and your progress (or lack of) on display, 
+            plus a little something to lose to keep you motivated and in shape 🍑
+          </p>
+          
+          <form onSubmit={handleSubmit} className="signup-form">
+            <input
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder="Enter your email"
+              required
+              className="email-input body-one-regular"
+            />
+            <button type="submit" className="signup-button body-one-semibold">
+              Sign up to the waitlist
+            </button>
+          </form>
         </div>
         
-        <h2 className="subtitle">Stick to your workouts, always.</h2>
-        
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input
-            type="email"
-            value={email}
-            onChange={handleEmailChange}
-            placeholder="Enter your email"
-            required
-            className="email-input"
-          />
-          <button type="submit" className="signup-button">
-            Sign up to the waitlist
-          </button>
-        </form>
+        {/* No need for a spacer anymore */}
       </div>
       
       <footer className="footer">
         <div className="footer-links">
-          <a href="/terms" className="footer-link">Terms and Conditionsss</a>
+          <a href="/terms" className="footer-link body-two-regular">Terms and Conditionsss</a>
           <span className="separator">|</span>
-          <a href="/privacy" className="footer-link">Privacy Policy</a>
+          <a href="/privacy" className="footer-link body-two-regular">Privacy Policy</a>
         </div>
       </footer>
     </div>

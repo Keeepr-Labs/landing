@@ -1,3 +1,156 @@
+/* Manrope Font Declarations */
+@font-face {
+  font-family: 'Manrope-Regular';
+  src: url('../public/fonts/static/Manrope-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Manrope-Medium';
+  src: url('../public/fonts/static/Manrope-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Manrope-SemiBold';
+  src: url('../public/fonts/static/Manrope-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Typography Classes */
+.title-large-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 40px;
+  line-height: 56px;
+}
+
+.title-large-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 40px;
+  line-height: 56px;
+}
+
+.title-one-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 32px;
+  line-height: 44.8px;
+}
+
+.title-one-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 32px;
+  line-height: 44.8px;
+}
+
+.title-three-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 24px;
+  line-height: 33.6px;
+}
+
+.title-four-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.title-four-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.body-one-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.body-one-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.body-one-medium {
+  font-family: 'Manrope-Medium', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.body-one-medium-link {
+  font-family: 'Manrope-Medium', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+}
+
+.body-one-semibold-link {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 16px;
+}
+
+.body-two-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.body-two-regular-italic {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.body-two-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.body-two-medium {
+  font-family: 'Manrope-Medium', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.caption-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.caption-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.overline-regular {
+  font-family: 'Manrope-Regular', sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 1.32px;
+  text-transform: uppercase;
+}
+
+.overline-semibold {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 1.32px;
+  text-transform: uppercase;
+}
+
 /* Reset some default styles */
 * {
   margin: 0;
@@ -7,20 +160,108 @@
 
 body, html {
   height: 100%;
-  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+  font-family: 'Manrope-Regular', sans-serif; /* Updated to use Manrope as default font */
+  background-color: #1D0E5A; /* Changed to darker purple as base color */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 /* Main landing page container */
 .landing-page {
-  min-height: 100vh;
+  min-height: 100vh; /* Full viewport height */
   width: 100%;
-  background-color: #4524CC; /* Purple background color */
-  /* Background properties removed as they're now handled in the React component */
+  position: relative;
+  overflow: hidden; /* Prevent overflow */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  background: radial-gradient(
+    circle at 50% 40%,    /* Changed from 50% 50% to move gradient higher */
+    #4524CC 0%,    /* Lighter purple in center */
+    #3A1EB8 30%,   /* Medium purple */
+    #1D0E5A 70%    /* Darker purple at edges */
+  );
+  background-size: 200% 200%;
+  animation: gradientPulse 10s ease-in-out infinite; /* Changed from 15s to 10s for faster pulsation */
+}
+
+/* Remove the pseudo-element gradient */
+/* .landing-page::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #4524CC 0%,    
+    #3A1EB8 30%,   
+    #1D0E5A 70%    
+  );
+  z-index: -1;
+  background-size: 150% 150%;
+  animation: gradientPosition 15s ease-in-out infinite;
+} */
+
+/* Remove the position animation */
+/* @keyframes gradientPosition {
+  0% {
+    background-position: 0% 0%;
+    transform: translate(0%, 0%);
+  }
+  20% {
+    background-position: 100% 0%;
+    transform: translate(-5%, 5%);
+  }
+  40% {
+    background-position: 100% 100%;
+    transform: translate(5%, 5%);
+  }
+  60% {
+    background-position: 0% 100%;
+    transform: translate(5%, -5%);
+  }
+  80% {
+    background-position: 50% 50%;
+    transform: translate(-5%, -5%);
+  }
+  100% {
+    background-position: 0% 0%;
+    transform: translate(0%, 0%);
+  }
+} */
+
+/* Restore the simple pulse animation */
+@keyframes gradientPulse {
+  0% {
+    background-size: 100% 100%;
+  }
+  50% {
+    background-size: 120% 120%;
+  }
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
+/* Animation for container size - removing this as we're using gradientPulse instead */
+/* @keyframes gradientMove {
+  0% {
+    background-size: 200% 200%;
+  }
+  50% {
+    background-size: 180% 180%;
+  }
+  100% {
+    background-size: 200% 200%;
+  }
+} */
+
+/* Remove the old gradient background */
+.gradient-background {
+  display: none;
 }
 
 /* Background container and SVG */
@@ -31,22 +272,23 @@ body, html {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  z-index: 0;
+  z-index: 1; /* Above the gradient background */
   pointer-events: none; /* Ensure clicks pass through to elements below */
+  opacity: 0.5; /* Reduce opacity to show gradient beneath better */
 }
 
 .background-svg {
   position: absolute;
-  top: -15%;
-  left: -15%; /* Move further left to align more to the left side */
-  width: 85%; /* Slightly larger width */
+  top: -5%; /* Moved up from 10% to position higher, slightly above the logo */
+  left: -10%; /* Adjusted from -20% to be more centered */
+  width: 120%; /* Increased from 85% to make it larger */
   height: auto; /* Maintain aspect ratio */
   object-fit: contain; /* Ensure the entire image is visible */
   opacity: 0.7; /* Slightly adjusted opacity */
   filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
   image-rendering: -webkit-optimize-contrast; /* Improve image rendering in webkit browsers */
   image-rendering: crisp-edges; /* Improve image rendering in other browsers */
-  transform-origin: top left; /* Set transform origin to top left */
+  transform-origin: center center; /* Changed from top left to center for better positioning */
   transform: rotate(-5deg); /* Slight rotation for visual interest */
   mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
 }
@@ -68,8 +310,9 @@ body, html {
 @media (min-width: 769px) {
   .background-svg {
     animation: float 15s ease-in-out infinite;
-    left: -15%; /* Position more to the left on desktop */
-    width: 100%; /* Larger width to ensure it covers enough area */
+    left: -5%; /* Adjusted to be more centered */
+    width: 110%; /* Adjusted for better centering */
+    top: -5%; /* Keep consistent with the base style */
   }
 }
 
@@ -78,17 +321,26 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 2rem;
-  margin-top: 10vh; /* Increased top margin for better spacing */
-  flex: 1;
+  margin-top: 5vh; /* Reduced from 10vh to position content higher */
   position: relative;
-  z-index: 1; /* Ensure content appears above background */
+  z-index: 2; /* Above both background layers */
   width: 100%;
   max-width: 1200px; /* Limit maximum width for larger screens */
   margin-left: auto;
   margin-right: auto;
   overflow: visible; /* Ensure content can overflow container if needed */
+}
+
+/* Initial viewport section - explicitly contains what's visible on first load */
+.initial-viewport {
+  min-height: 90vh; /* Takes up 90% of the viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center to flex-start to move content up */
+  width: 100%;
+  padding-top: 3vh; /* Reduced from 5vh to position content higher */
 }
 
 /* Adjust content positioning for mobile */
@@ -98,12 +350,20 @@ body, html {
     padding: 1.5rem;
   }
   
+  .initial-viewport {
+    min-height: 95vh; /* Slightly taller on tablets */
+  }
+  
   .logo-container {
     margin-bottom: 2rem; /* Reduced margin on mobile */
   }
   
   .subtitle {
     margin-top: 1rem; /* Less top margin on mobile */
+  }
+  
+  .content-spacer {
+    min-height: 70vh; /* Slightly smaller on tablets but still pushes footer down */
   }
 }
 
@@ -113,6 +373,10 @@ body, html {
     padding: 1rem;
   }
   
+  .initial-viewport {
+    min-height: 98vh; /* Almost full height on phones */
+  }
+  
   .logo-container {
     margin-bottom: 1.5rem; /* Further reduced margin on small mobile */
   }
@@ -120,36 +384,54 @@ body, html {
   .subtitle {
     margin-top: 0.5rem; /* Less top margin on small mobile */
   }
+  
+  .content-spacer {
+    min-height: 60vh; /* Smaller on phones but still pushes footer down */
+  }
 }
 
 /* Logo styling */
 .logo-container {
-  margin-bottom: 3rem; /* Increased from 2rem */
+  margin-bottom: 4rem; /* Increased from 2rem for more spacing */
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 1rem; /* Added padding */
+  padding: 0.5rem;
   overflow: visible; /* Ensure logo can overflow container if needed */
 }
 
 .logo {
-  width: 90vw; /* 90% of viewport width */
-  max-width: 1000px; /* Maximum width */
+  width: 15vw; /* Reduced from 20vw to make it smaller */
+  max-width: 150px; /* Reduced from 200px */
   height: auto;
-  transform-style: preserve-3d; /* Enable 3D transformations */
-  transition: transform 0.5s;
-  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3)); /* Add shadow for depth */
+  object-fit: contain;
+  transition: all 0.3s ease;
 }
 
 /* Subtitle styling */
 .subtitle {
-  font-size: 2rem;
-  font-weight: bold;
   color: #ffffff; /* White text for better contrast on purple */
   text-align: center;
-  margin-top: 2rem; /* Added top margin */
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 7rem; /* Increased from 5rem to 7rem for more spacing with subtitle */
+  letter-spacing: 1.32px; /* Match the overline style */
+  text-transform: uppercase; /* Match the overline style */
+  font-size: 72px; /* Doubled from 36px */
+  line-height: 86px; /* Adjusted from 48px to maintain proportion */
+  max-width: 900px; /* Increased from 800px for larger text */
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* New subtitle text styling */
+.subtitle-text {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 6rem; /* Increased from 4rem to 6rem for more spacing with form */
+  max-width: 700px; /* Limit width for better readability */
+  font-size: 18px; /* Slightly larger than standard body text */
+  line-height: 28px; /* Increased line height for readability */
+  opacity: 0.9; /* Slightly transparent for visual hierarchy */
+  padding: 0 1rem; /* Added padding for mobile */
 }
 
 /* Form styling */
@@ -165,24 +447,24 @@ body, html {
   padding: 1rem;
   font-size: 1rem;
   border: 2px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  border-radius: 30px; /* Changed from 20px to 30px for more rounded edges */
+  margin-bottom: 0.5rem;
   width: 100%;
 }
 
 .signup-button {
   padding: 1rem;
   font-size: 1rem;
-  background-color: #ffffff; /* White button */
-  color: #4524CC; /* Purple text to match background */
-  border: none;
-  border-radius: 4px;
+  background-color: #66EBB1; /* Changed from white to #66EBB1 (mint green) */
+  color: #1D0E5A; /* Changed to darker purple for better contrast with mint green */
+  border: 2px solid #66EBB1; /* Changed from none to 2px solid mint green */
+  border-radius: 30px; /* Changed from 20px to 30px for more rounded edges */
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .signup-button:hover {
-  background-color: #f0f0f0; /* Slightly darker white on hover */
+  background-color: #50D9A0; /* Slightly darker mint green on hover */
 }
 
 /* Footer styling */
@@ -193,7 +475,8 @@ body, html {
   color: white;
   text-align: center;
   position: relative;
-  z-index: 1; /* Ensure footer appears above background */
+  z-index: 2; /* Above both background layers */
+  margin-top: 10vh; /* Add space above footer */
 }
 
 .footer-links {
@@ -225,7 +508,18 @@ body, html {
 /* Responsive design */
 @media (max-width: 768px) {
   .subtitle {
-    font-size: 1.5rem;
+    font-size: 54px; /* Increased from 30px */
+    line-height: 64px; /* Increased from 40px */
+    margin-bottom: 2rem; /* Adjusted for mobile */
+    letter-spacing: 1.2px; /* Slightly reduced for mobile */
+  }
+  
+  .subtitle-text {
+    font-size: 16px;
+    line-height: 24px;
+    padding: 0 1.5rem;
+    margin-bottom: 3rem; /* Increased spacing */
+    letter-spacing: 1.2px; /* Slightly reduced for mobile */
   }
   
   .signup-form {
@@ -233,22 +527,39 @@ body, html {
   }
   
   .background-svg {
-    width: 100%; /* Full width on tablets */
-    height: 100%; /* Full height on tablets */
-    object-fit: cover; /* Cover the entire background */
-    top: 0;
-    left: 0; /* Reset left position for mobile */
-    transform: none; /* Remove rotation */
-    animation: none; /* Remove animation */
-    opacity: 0.5; /* Adjusted opacity for better content visibility */
-    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
-    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
+    display: none; /* Hide the background SVG on mobile */
+  }
+  
+  .desktop-bg {
+    display: none;
+  }
+  
+  .mobile-bg {
+    display: none; /* Hide mobile background as well */
+  }
+  
+  .logo {
+    width: 20vw; /* Adjusted from 25vw */
+    max-width: 120px; /* Reduced from 180px */
+  }
+  
+  .logo-container {
+    margin-bottom: 3rem; /* Adjusted for mobile */
   }
 }
 
 @media (max-width: 480px) {
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 42px; /* Increased from 24px */
+    line-height: 52px; /* Increased from 32px */
+    letter-spacing: 1px; /* Further reduced for small mobile */
+    margin-bottom: 1.5rem;
+  }
+  
+  .subtitle-text {
+    padding: 0 1rem;
+    margin-bottom: 2.5rem; /* Adjusted for mobile */
+    letter-spacing: 1px; /* Further reduced for small mobile */
   }
   
   .signup-form {
@@ -265,12 +576,24 @@ body, html {
   }
   
   .background-svg {
-    width: 100%; /* Full width on mobile */
-    height: 100%; /* Full height on mobile */
-    object-fit: cover; /* Cover the entire background */
-    opacity: 0.4; /* Adjusted opacity for mobile */
-    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
-    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
+    display: none; /* Hide the background SVG on small mobile */
+  }
+  
+  .desktop-bg {
+    display: none;
+  }
+  
+  .mobile-bg {
+    display: none; /* Hide mobile background as well */
+  }
+  
+  .logo {
+    width: 25vw; /* Adjusted from 30vw */
+    max-width: 100px; /* Reduced from 150px */
+  }
+  
+  .logo-container {
+    margin-bottom: 2.5rem; /* Adjusted for mobile */
   }
 }
 
@@ -296,27 +619,36 @@ body, html {
   }
 }
 
-/* Media query for mobile phones */
+/* Mobile adjustments for logo */
+@media (max-width: 768px) {
+  .logo-container {
+    margin-bottom: 3rem; /* Increased from 1.5rem */
+  }
+  
+  .logo {
+    width: 20vw; /* Adjusted from 25vw */
+  }
+}
+
 @media (max-width: 480px) {
-  .subtitle {
-    font-size: 1.2rem;
+  .logo-container {
+    margin-bottom: 2.5rem; /* Increased from 1.5rem */
   }
   
-  .email-input, .signup-button {
-    padding: 0.8rem;
-    font-size: 0.9rem;
+  .logo {
+    width: 25vw; /* Adjusted from 30vw */
   }
-  
-  .footer-link {
-    font-size: 0.8rem;
+}
+
+/* Mobile adjustments for gradient */
+@media (max-width: 768px) {
+  .landing-page {
+    animation-duration: 5s; /* Changed from 20s to 12s for faster pulsation on tablets */
   }
-  
-  .background-svg {
-    width: 100%; /* Full width on mobile */
-    height: 100%; /* Full height on mobile */
-    object-fit: cover; /* Cover the entire background */
-    opacity: 0.4; /* Adjusted opacity for mobile */
-    filter: brightness(1) contrast(1); /* Ensure consistent brightness and contrast */
-    mix-blend-mode: screen; /* Screen blend mode works well with white elements on colored backgrounds */
+}
+
+@media (max-width: 480px) {
+  .landing-page {
+    animation-duration: 5s; /* Changed from 25s to 15s for faster pulsation on phones */
   }
 }
