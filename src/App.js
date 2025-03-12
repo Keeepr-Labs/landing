@@ -60,9 +60,9 @@ function Home() {
           <h2 className="subtitle overline-semibold">Stick to your workouts, always</h2>
           
           <p className="subtitle-text body-one-regular">
-            No AI magic. Just accountability.<br />
-            A group chat with friends, with your goals and progress (or lack of) on display, 
-            plus a little something on the line and voilá 🍑
+            No AI magic - just good old accountability.<br />
+            A group chat with friends, with your workout goals and progress (or lack of) on display, 
+            plus, a little something if you miss those goals...and voilá 🍑
           </p>
           
           <form onSubmit={handleSubmit} className="signup-form">
