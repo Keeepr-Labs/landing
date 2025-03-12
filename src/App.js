@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 
-function App() {
+// Import page components
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+
+// Home page component
+function Home() {
   const [email, setEmail] = useState('');
 
   const handleEmailChange = (e) => {
@@ -77,12 +83,25 @@ function App() {
       
       <footer className="footer">
         <div className="footer-links">
-          <a href="/terms" className="footer-link body-two-regular">Terms and Conditionsss</a>
+          <Link to="/terms" className="footer-link body-two-regular">Terms and Conditions</Link>
           <span className="separator">|</span>
-          <a href="/privacy" className="footer-link body-two-regular">Privacy Policy</a>
+          <Link to="/privacy" className="footer-link body-two-regular">Privacy Policy</Link>
         </div>
       </footer>
     </div>
+  );
+}
+
+// Main App component with routing
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+      </Routes>
+    </Router>
   );
 }
 
