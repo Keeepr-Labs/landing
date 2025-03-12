@@ -12,7 +12,7 @@ function App() {
     e.preventDefault();
     // Here you would typically send the email to your backend
     console.log('Email submitted:', email);
-    alert('Thank you for joining our waitlist!');
+    alert('Thank you, you are now on the waitlist!');
     setEmail('');
   };
 
@@ -46,12 +46,14 @@ function App() {
               alt="Logo" 
               className="logo" 
             />
+            <span className="beta-label">beta</span>
           </div>
           
           <h2 className="subtitle overline-semibold">Stick to your workouts, always</h2>
           
           <p className="subtitle-text body-one-regular">
-            No AI magic - just accountability. A group chat with friends, your goals and your progress (or lack of) on display, 
+            No AI magic. Just accountability.<br />
+            A group chat with friends, your goals and your progress (or lack of) on display, 
             plus a little something to lose to keep you motivated and in shape 🍑
           </p>
           

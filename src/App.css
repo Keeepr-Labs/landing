@@ -398,6 +398,7 @@ body, html {
   justify-content: center;
   padding: 0.5rem;
   overflow: visible; /* Ensure logo can overflow container if needed */
+  position: relative; /* Add this line */
 }
 
 .logo {
@@ -450,6 +451,13 @@ body, html {
   border-radius: 30px; /* Changed from 20px to 30px for more rounded edges */
   margin-bottom: 0.5rem;
   width: 100%;
+  transition: border-color 0.3s;
+  outline: none; /* Remove default focus outline */
+}
+
+.email-input:focus {
+  border-color: #66EBB1; /* Match the button color */
+  box-shadow: 0 0 0 2px rgba(102, 235, 177, 0.2); /* Subtle glow effect with the same color */
 }
 
 .signup-button {
@@ -650,5 +658,34 @@ body, html {
 @media (max-width: 480px) {
   .landing-page {
     animation-duration: 5s; /* Changed from 25s to 15s for faster pulsation on phones */
+  }
+}
+
+/* Beta label styling */
+.beta-label {
+  font-family: 'Manrope-SemiBold', sans-serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #A99BFF; /* Light purple color */
+  position: absolute;
+  bottom: 0; /* Align with the bottom of the logo */
+  left: 60%; /* Start at the last 10% of the logo container */
+  transform: translateY(10%); /* Push down by half its height for partial overlap */
+  text-transform: lowercase;
+  letter-spacing: 1px;
+}
+
+/* Responsive adjustments for beta label */
+@media (max-width: 768px) {
+  .beta-label {
+    font-size: 10px;
+    left: 60%; /* Slightly adjusted for tablet */
+  }
+}
+
+@media (max-width: 480px) {
+  .beta-label {
+    font-size: 9px;
+    left: 60%; /* Adjusted for mobile to ensure visibility */
   }
 }
