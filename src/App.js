@@ -47,12 +47,14 @@ function Home() {
         {/* Initial viewport - what's visible on first load */}
         <div className="initial-viewport">
           <div className="logo-container">
-            <img 
-              src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
-              alt="Logo" 
-              className="logo" 
-            />
-            <span className="beta-label">beta</span>
+            <div className="logo-wrapper">
+              <img 
+                src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
+                alt="Logo" 
+                className="logo" 
+              />
+              <span className="beta-label">beta</span>
+            </div>
           </div>
           
           <h2 className="subtitle overline-semibold">Stick to your workouts, always</h2>

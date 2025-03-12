@@ -8,11 +8,13 @@ function TermsAndConditions() {
       <div className="content policy-content">
         <div className="logo-container">
           <Link to="/">
-            <img 
-              src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
-              alt="Logo" 
-              className="logo" 
-            />
+            <div className="logo-wrapper">
+              <img 
+                src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
+                alt="Logo" 
+                className="logo" 
+              />
+            </div>
           </Link>
         </div>
         

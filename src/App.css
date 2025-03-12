@@ -398,7 +398,12 @@ body, html {
   justify-content: center;
   padding: 0.5rem;
   overflow: visible; /* Ensure logo can overflow container if needed */
-  position: relative; /* Add this line */
+}
+
+/* New logo wrapper for better positioning */
+.logo-wrapper {
+  position: relative;
+  display: inline-block; /* Contains the logo and beta label */
 }
 
 .logo {
@@ -661,32 +666,37 @@ body, html {
   }
 }
 
-/* Beta label styling */
+/* Beta label styling - updated to be positioned relative to logo wrapper */
 .beta-label {
   font-family: 'Manrope-SemiBold', sans-serif;
   font-style: italic;
   font-size: 12px;
   color: #A99BFF; /* Light purple color */
   position: absolute;
-  bottom: 0; /* Align with the bottom of the logo */
-  left: 60%; /* Start at the last 10% of the logo container */
-  transform: translateY(10%); /* Push down by half its height for partial overlap */
+  bottom: -5px; /* Position slightly below the logo */
+  right: -20px; /* Position to the right of the logo */
   text-transform: lowercase;
   letter-spacing: 1px;
+  background-color: transparent; /* Changed from semi-transparent background to transparent */
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap; /* Prevent wrapping */
 }
 
 /* Responsive adjustments for beta label */
 @media (max-width: 768px) {
   .beta-label {
     font-size: 10px;
-    left: 60%; /* Slightly adjusted for tablet */
+    right: -15px;
+    bottom: -4px;
   }
 }
 
 @media (max-width: 480px) {
   .beta-label {
     font-size: 9px;
-    left: 60%; /* Adjusted for mobile to ensure visibility */
+    right: -12px;
+    bottom: -3px;
   }
 }
 
