@@ -61,8 +61,8 @@ function Home() {
           
           <p className="subtitle-text body-one-regular">
             No AI magic - just good old accountability.<br />
-            A group chat with friends, with your workout goals and progress (or lack of) on display, 
-            plus, a little something if you miss those goals...and voilá 🍑
+            A group chat with friends, with your workout goals and progress (or lack of) on display. 
+            Add having a little something to lose if you miss those goals...and voilá 🍑
           </p>
           
           <form onSubmit={handleSubmit} className="signup-form">
