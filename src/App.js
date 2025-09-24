@@ -60,9 +60,7 @@ function Home() {
           <h2 className="subtitle overline-semibold">Stick to your workouts, always</h2>
           
           <p className="subtitle-text body-one-regular">
-            Good old accountability.<br />
-            A group chat with friends, with everybody's workout goals and progress (or lack of) on display. <br />
-            Plus, everyone has to pledge a little something behind sticking to it. Skip one too many workouts, and ciao ciao to that little something.
+            iykyk
           </p>
           
           <form onSubmit={handleSubmit} className="signup-form">
