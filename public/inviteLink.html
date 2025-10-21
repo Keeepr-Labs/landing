@@ -10,7 +10,7 @@
 
   <!-- Open Graph / Facebook / WhatsApp / iMessage -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://getkeeep.com/inviteLink" />
+  <meta property="og:url" content="https://getkeeep.com/invitelink" />
   <meta property="og:title" content="✉️ Join my private accountability group" />
   <meta property="og:description" content="Stick to your workouts, always. Join Keeep and stay accountable to your fitness goals." />
   <meta property="og:image" content="https://getkeeep.com/images/shareLink.png" />
@@ -24,7 +24,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://getkeeep.com/inviteLink" />
+  <meta name="twitter:url" content="https://getkeeep.com/invitelink" />
   <meta name="twitter:title" content="✉️ Join my private accountability group" />
   <meta name="twitter:description" content="Stick to your workouts, always. Join Keeep and stay accountable to your fitness goals." />
   <meta name="twitter:image" content="https://getkeeep.com/images/logo.png" />
@@ -33,9 +33,6 @@
 
   <!-- Favicon -->
   <link rel="icon" href="/favicon.png" />
-
-  <!-- Auto-redirect to main site after scraping -->
-  <meta http-equiv="refresh" content="0;url=https://getkeeep.com" />
 
   <style>
     body {
@@ -84,5 +81,12 @@
     <p>Join Keeep and stay accountable to your fitness goals.</p>
     <div class="loader">Redirecting...</div>
   </div>
+
+  <script>
+    // Redirect users (but not scrapers) to main site after 1 second
+    setTimeout(function() {
+      window.location.href = 'https://getkeeep.com';
+    }, 1000);
+  </script>
 </body>
 </html>
