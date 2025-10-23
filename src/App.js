@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import CookieConsent from 'react-cookie-consent';
 import './App.css';
 
 // Import page components
@@ -101,6 +102,51 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
       </Routes>
+
+      <CookieConsent
+        location="bottom"
+        buttonText="Accept"
+        declineButtonText="Decline"
+        enableDeclineButton
+        cookieName="keeepGDPRConsent"
+        style={{
+          background: "rgba(0, 0, 0, 0.85)",
+          fontSize: "14px",
+          padding: "20px",
+        }}
+        buttonStyle={{
+          background: "#4CAF50",
+          color: "white",
+          fontSize: "14px",
+          padding: "10px 30px",
+          borderRadius: "5px",
+          border: "none",
+          cursor: "pointer",
+        }}
+        declineButtonStyle={{
+          background: "transparent",
+          color: "white",
+          fontSize: "14px",
+          padding: "10px 30px",
+          borderRadius: "5px",
+          border: "1px solid white",
+          cursor: "pointer",
+        }}
+        expires={365}
+        onAccept={() => {
+          console.log("User accepted cookies");
+          // Future: Initialize analytics here when needed
+        }}
+        onDecline={() => {
+          console.log("User declined cookies");
+        }}
+      >
+        This website uses cookies to enhance the user experience. By continuing to use this site, you consent to our use of cookies. See our{" "}
+        <Link to="/privacy" style={{ color: "#4CAF50", textDecoration: "underline" }}>
+          Privacy Policy
+        </Link>{" "}
+        for more information.
+      </CookieConsent>
     </Router>
   );
 }

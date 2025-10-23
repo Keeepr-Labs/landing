@@ -113,6 +113,21 @@ function PrivacyPolicy() {
           </section>
           
           <section className="policy-section">
+            <h2>Cookies and Tracking Technologies</h2>
+            <p>
+              Our website uses cookies to enhance your browsing experience. Cookies are small text files stored on your device that help us understand how you use our site.
+            </p>
+            <p><strong>Types of Cookies We Use:</strong></p>
+            <ul>
+              <li><strong>Essential Cookies:</strong> Required for the website to function properly, including storing your cookie consent preferences.</li>
+              <li><strong>Analytics Cookies (if accepted):</strong> Help us understand how visitors interact with our website to improve user experience.</li>
+            </ul>
+            <p>
+              You can manage your cookie preferences through the cookie consent banner that appears when you first visit our website. You can withdraw your consent at any time by clearing your browser cookies or contacting us at <a href="mailto:privacy@getkeeep.com">privacy@getkeeep.com</a>.
+            </p>
+          </section>
+
+          <section className="policy-section">
             <h2>Changes to This Policy</h2>
             <p>
               We may update this Privacy Policy from time to time. We will notify you of any significant changes.
