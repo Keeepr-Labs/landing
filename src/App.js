@@ -6,6 +6,7 @@ import './App.css';
 // Import page components
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import Feedback from './pages/Feedback';
 
 // Home page component
 function Home() {
@@ -101,6 +102,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/feedback" element={<Feedback />} />
       </Routes>
 
       <CookieConsent
