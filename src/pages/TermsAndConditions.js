@@ -174,9 +174,9 @@ function TermsAndConditions() {
       
       <footer className="footer">
         <div className="footer-links">
-          <Link to="/terms" className="footer-link">Terms and Conditions</Link>
+          <Link to="/terms-of-service" className="footer-link">Terms and Conditions</Link>
           <span className="separator">|</span>
-          <Link to="/privacy" className="footer-link">Privacy Policy</Link>
+          <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
         </div>
       </footer>
     </div>

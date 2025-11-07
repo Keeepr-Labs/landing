@@ -31,9 +31,9 @@ function Feedback() {
 
         <footer className="footer">
           <div className="footer-links">
-            <Link to="/terms" className="footer-link body-two-regular">Terms and Conditions</Link>
+            <Link to="/terms-of-service" className="footer-link body-two-regular">Terms and Conditions</Link>
             <span className="separator">|</span>
-            <Link to="/privacy" className="footer-link body-two-regular">Privacy Policy</Link>
+            <Link to="/privacy-policy" className="footer-link body-two-regular">Privacy Policy</Link>
           </div>
         </footer>
       </div>

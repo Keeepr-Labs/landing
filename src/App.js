@@ -85,9 +85,9 @@ function Home() {
       
       <footer className="footer">
         <div className="footer-links">
-          <Link to="/terms" className="footer-link body-two-regular">Terms and Conditions</Link>
+          <Link to="/terms-of-service" className="footer-link body-two-regular">Terms and Conditions</Link>
           <span className="separator">|</span>
-          <Link to="/privacy" className="footer-link body-two-regular">Privacy Policy</Link>
+          <Link to="/privacy-policy" className="footer-link body-two-regular">Privacy Policy</Link>
         </div>
       </footer>
     </div>
@@ -100,8 +100,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsAndConditions />} />
         <Route path="/feedback" element={<Feedback />} />
       </Routes>
 
@@ -144,7 +144,7 @@ function App() {
         }}
       >
         This website uses cookies to enhance the user experience. By continuing to use this site, you consent to our use of cookies. See our{" "}
-        <Link to="/privacy" style={{ color: "#4CAF50", textDecoration: "underline" }}>
+        <Link to="/privacy-policy" style={{ color: "#4CAF50", textDecoration: "underline" }}>
           Privacy Policy
         </Link>{" "}
         for more information.
