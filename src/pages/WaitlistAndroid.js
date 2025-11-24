@@ -53,10 +53,10 @@ function WaitlistAndroid() {
             </div>
           </div>
 
-          <h2 className="subtitle overline-semibold">Sorry, we only have an iOS app right now</h2>
+          <h2 className="subtitle-text body-one-regular">Sorry, we only have an iOS app right now 🫣</h2>
 
           <p className="subtitle-text body-one-regular">
-            Working hard to bring Keeep to Android. We'll keep you posted:
+            Working hard to bring Keeep to Android. Be the first to know when it's available:
           </p>
 
           <form onSubmit={handleSubmit} className="signup-form">
@@ -64,12 +64,12 @@ function WaitlistAndroid() {
               type="email"
               value={email}
               onChange={handleEmailChange}
-              placeholder="Enter your email"
+              placeholder="Your email"
               required
               className="email-input body-one-regular"
             />
             <button type="submit" className="signup-button body-one-semibold">
-              Join Android waitlist
+              Keeep me posted
             </button>
           </form>
         </div>
