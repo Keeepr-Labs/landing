@@ -7,6 +7,7 @@ import './App.css';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Feedback from './pages/Feedback';
+import WaitlistAndroid from './pages/WaitlistAndroid';
 
 // Home page component
 function Home() {
@@ -103,6 +104,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsAndConditions />} />
         <Route path="/feedback" element={<Feedback />} />
+        <Route path="/waitlistAndroid" element={<WaitlistAndroid />} />
       </Routes>
 
       <CookieConsent
