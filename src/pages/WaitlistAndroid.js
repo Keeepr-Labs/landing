@@ -13,7 +13,7 @@ function WaitlistAndroid() {
     e.preventDefault();
     // Here you would typically send the email to your backend for Android waitlist
     console.log('Android waitlist email submitted:', email);
-    alert('Thank you! We'll notify you when Keeep is available on Android.');
+    alert('Thank you! We\'ll notify you when Keeep is available on Android.');
     setEmail('');
   };
 
@@ -56,7 +56,7 @@ function WaitlistAndroid() {
           <h2 className="subtitle overline-semibold">Sorry, we only have an iOS app right now</h2>
 
           <p className="subtitle-text body-one-regular">
-            Working hard to bring Keeep to Android. We'll keep you posted!
+            Working hard to bring Keeep to Android. We'll keep you posted:
           </p>
 
           <form onSubmit={handleSubmit} className="signup-form">
