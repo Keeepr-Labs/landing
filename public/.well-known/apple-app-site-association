@@ -1,0 +1,18 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "BAQ4296757.com.fervelgo.keeepr",
+          "BAQ4296757.com.fervelgo.keeepr.dev"
+        ],
+        "components": [
+          {
+            "/": "/invite*",
+            "comment": "Invite deep links. Accepts /invite with optional c= and g= query params."
+          }
+        ]
+      }
+    ]
+  }
+}
