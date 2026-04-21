@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Opening Keeep…</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #4524CC;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.15;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      font-size: 16px;
+      line-height: 1.4;
+      opacity: 0.82;
+      margin: 0 0 40px;
+      max-width: 320px;
+    }
+    .cta {
+      display: inline-block;
+      background: #fff;
+      color: #4524CC;
+      font-weight: 600;
+      font-size: 17px;
+      padding: 16px 32px;
+      border-radius: 32px;
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+    .ghost {
+      display: inline-block;
+      color: rgba(255,255,255,0.78);
+      font-size: 15px;
+      text-decoration: none;
+      padding: 10px 16px;
+    }
+    .appstore-badge {
+      height: 52px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo">Keeep</div>
+    <h1 class="title">Join your group on Keeep</h1>
+    <p class="sub" id="sub">Opening the Keeep app…</p>
+
+    <a id="openApp" class="cta" href="#">Open Keeep</a>
+    <a id="getApp" class="ghost" href="#">Don't have the app? Get it</a>
+  </div>
+
+  <script>
+    (function () {
+      var APP_STORE_URL = 'https://apps.apple.com/app/id6471142186';
+
+      var params = window.location.search || '';
+      var schemeUrl = 'keeep://invite' + params;
+
+      var openApp = document.getElementById('openApp');
+      var getApp = document.getElementById('getApp');
+      var sub = document.getElementById('sub');
+
+      openApp.setAttribute('href', schemeUrl);
+      getApp.setAttribute('href', APP_STORE_URL);
+
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+      if (!isIOS) {
+        sub.textContent = 'Keeep is available on iPhone.';
+        return;
+      }
+
+      var timeout = setTimeout(function () {
+        window.location.href = APP_STORE_URL;
+      }, 1200);
+
+      window.addEventListener('pagehide', function () {
+        clearTimeout(timeout);
+      });
+      window.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+          clearTimeout(timeout);
+        }
+      });
+
+      window.location.href = schemeUrl;
+    })();
+  </script>
+</body>
+</html>
