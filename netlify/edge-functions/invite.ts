@@ -56,25 +56,32 @@ const buildTitle = (data: PreviewResponse): string | null => {
 
 const buildDescription = (data: PreviewResponse): string | null => {
   const { groupName, inviterFirstName } = data;
+  // Loss-aversion line leads every branch — it's the most differentiated
+  // signal Keeep carries, and it never duplicates the title (which already
+  // names the group). When no inviter is known, the urgency line closes
+  // the description because the group name isn't doing social-proof work.
   if (inviterFirstName && groupName) {
     return clamp(
-      `${inviterFirstName} invited you to ${groupName}. Claim your spot before the invite expires.`,
+      `${inviterFirstName} invited you to ${groupName}. Lock in workouts. Lose money if you skip.`,
       DESCRIPTION_MAX,
     );
   }
   if (inviterFirstName) {
     return clamp(
-      `${inviterFirstName} invited you to Keeep. Claim your spot before the invite expires.`,
+      `${inviterFirstName} invited you to Keeep. Lock in workouts. Lose money if you skip.`,
       DESCRIPTION_MAX,
     );
   }
   if (groupName) {
     return clamp(
-      `Join ${groupName} on Keeep. Claim your spot before the invite expires.`,
+      `Lock in workouts. Lose money if you skip. Claim your spot before the invite expires.`,
       DESCRIPTION_MAX,
     );
   }
-  return null;
+  return clamp(
+    `Lock in workouts. Lose money if you skip. Train with friends who actually show up.`,
+    DESCRIPTION_MAX,
+  );
 };
 
 /**
