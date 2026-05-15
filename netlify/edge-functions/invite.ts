@@ -53,15 +53,22 @@ const clamp = (s: string, max: number): string =>
 // order. When the inviter is unknown (e.g., URL missing `i=` or the lookup
 // failed gracefully), fall back to a passive but still personal framing
 // that keeps the "invitation" word doing the emotional work.
+//
+// The group name is wrapped in hyphens so it reads as a distinct entity
+// regardless of how the user capitalized it. Without the brackets, a name
+// like "link test" can blend into the surrounding sentence and lose its
+// identity ("Fernando invited you to join link test" → which words are
+// the group?).
 const buildTitle = (data: PreviewResponse): string | null => {
   if (!data.groupName) return null;
+  const wrappedGroup = `-${data.groupName}-`;
   if (data.inviterFirstName) {
     return clamp(
-      `${data.inviterFirstName} invited you to join ${data.groupName}`,
+      `${data.inviterFirstName} invited you to join ${wrappedGroup}`,
       TITLE_MAX,
     );
   }
-  return clamp(`You're invited to join ${data.groupName}`, TITLE_MAX);
+  return clamp(`You're invited to join ${wrappedGroup}`, TITLE_MAX);
 };
 
 // Description is the brand's stated reason for existing. Same across every
