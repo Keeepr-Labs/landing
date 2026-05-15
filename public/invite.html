@@ -7,13 +7,16 @@
   <title>Opening Keeep…</title>
 
   <!-- Primary -->
-  <meta name="description" content="Claim your spot! Invites expire 7 days after the group is created." />
+  <meta name="description" content="Make it easier to stick to your workout goals, whatever they are" />
 
   <!-- Open Graph (Messages, WhatsApp, Slack, Facebook) -->
+  <!-- og:title and og:description are rewritten per-invite by the Netlify -->
+  <!-- edge function at netlify/edge-functions/invite.ts when convoId data -->
+  <!-- is available. These static values are the fallback. -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Keeep" />
-  <meta property="og:title" content="Join my private accountability group" />
-  <meta property="og:description" content="Claim your spot! Invites expire 7 days after the group is created." />
+  <meta property="og:title" content="You're invited to join Keeep" />
+  <meta property="og:description" content="Make it easier to stick to your workout goals, whatever they are" />
   <meta property="og:image" content="https://getkeeep.com/images/shareLink.png" />
   <meta property="og:image:secure_url" content="https://getkeeep.com/images/shareLink.png" />
   <meta property="og:image:type" content="image/png" />
@@ -24,8 +27,8 @@
 
   <!-- Twitter / X (also used as fallback by some clients) -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Join my private accountability group" />
-  <meta name="twitter:description" content="Claim your spot! Invites expire 7 days after the group is created." />
+  <meta name="twitter:title" content="You're invited to join Keeep" />
+  <meta name="twitter:description" content="Make it easier to stick to your workout goals, whatever they are" />
   <meta name="twitter:image" content="https://getkeeep.com/images/shareLink.png" />
   <style>
     html, body {

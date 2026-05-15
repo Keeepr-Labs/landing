@@ -49,40 +49,29 @@ const escapeHtml = (s: string): string =>
 const clamp = (s: string, max: number): string =>
   s.length <= max ? s : s.slice(0, max - 1) + "…";
 
+// Title leans into the social signal — the inviter and the group, in that
+// order. When the inviter is unknown (e.g., URL missing `i=` or the lookup
+// failed gracefully), fall back to a passive but still personal framing
+// that keeps the "invitation" word doing the emotional work.
 const buildTitle = (data: PreviewResponse): string | null => {
   if (!data.groupName) return null;
-  return clamp(`Join ${data.groupName} on Keeep`, TITLE_MAX);
+  if (data.inviterFirstName) {
+    return clamp(
+      `${data.inviterFirstName} invited you to join ${data.groupName}`,
+      TITLE_MAX,
+    );
+  }
+  return clamp(`You're invited to join ${data.groupName}`, TITLE_MAX);
 };
 
-const buildDescription = (data: PreviewResponse): string | null => {
-  const { groupName, inviterFirstName } = data;
-  // Loss-aversion line leads every branch — it's the most differentiated
-  // signal Keeep carries, and it never duplicates the title (which already
-  // names the group). When no inviter is known, the urgency line closes
-  // the description because the group name isn't doing social-proof work.
-  if (inviterFirstName && groupName) {
-    return clamp(
-      `${inviterFirstName} invited you to ${groupName}. Lock in workouts. Lose money if you skip.`,
-      DESCRIPTION_MAX,
-    );
-  }
-  if (inviterFirstName) {
-    return clamp(
-      `${inviterFirstName} invited you to Keeep. Lock in workouts. Lose money if you skip.`,
-      DESCRIPTION_MAX,
-    );
-  }
-  if (groupName) {
-    return clamp(
-      `Lock in workouts. Lose money if you skip. Claim your spot before the invite expires.`,
-      DESCRIPTION_MAX,
-    );
-  }
-  return clamp(
-    `Lock in workouts. Lose money if you skip. Train with friends who actually show up.`,
+// Description is the brand's stated reason for existing. Same across every
+// branch — the personalization signal lives in the title, the value prop
+// lives here.
+const buildDescription = (_data: PreviewResponse): string | null =>
+  clamp(
+    `Make it easier to stick to your workout goals, whatever they are`,
     DESCRIPTION_MAX,
   );
-};
 
 /**
  * Fetch preview data from the backend with a hard timeout. Returns null
