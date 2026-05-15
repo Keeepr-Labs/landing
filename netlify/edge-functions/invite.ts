@@ -112,17 +112,22 @@ const replaceMetaContent = (
   value: string,
 ): string => {
   const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Lock the regex to double-quoted attribute boundaries. invite.html
+  // uses double quotes consistently, and matching on `["']` would treat
+  // apostrophes inside content (e.g., "You're invited...") as a closing
+  // boundary, causing partial replacement. The content class `[^"]*`
+  // correctly leaves apostrophes alone.
   // property|name first, content second
   const re1 = new RegExp(
-    `(<meta\\s+${attr}=["']${escapedKey}["']\\s+content=["'])([^"']*)(["'])`,
+    `(<meta\\s+${attr}="${escapedKey}"\\s+content=")[^"]*(")`,
     "gi",
   );
   // content first, property|name second
   const re2 = new RegExp(
-    `(<meta\\s+content=["'])([^"']*)(["']\\s+${attr}=["']${escapedKey}["'])`,
+    `(<meta\\s+content=")[^"]*("\\s+${attr}="${escapedKey}")`,
     "gi",
   );
-  return html.replace(re1, `$1${value}$3`).replace(re2, `$1${value}$3`);
+  return html.replace(re1, `$1${value}$2`).replace(re2, `$1${value}$2`);
 };
 
 export default async (
