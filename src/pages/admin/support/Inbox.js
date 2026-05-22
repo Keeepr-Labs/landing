@@ -4,20 +4,18 @@
  *   ┌──────────────┬──────────────────────────────┬──────────────┐
  *   │ Channel list │  Active thread               │ User context │
  *   │              │                              │ sidebar      │
- *   │ (Stream      │ (Stream MessageList +        │ (Keeep-      │
- *   │  ChannelList)│  MessageInput from RN)       │  backend     │
- *   │              │                              │  enrichment) │
- *   │ Filter:      │                              │              │
- *   │ members $in  │                              │ Selected     │
- *   │ ['Keeep']    │                              │ user's       │
- *   │              │                              │ groups +     │
- *   │              │                              │ tickets +    │
- *   │              │                              │ join date    │
+ *   │ Custom       │ (Stream Channel + Window +   │ (Keeep-      │
+ *   │ Preview:     │  MessageList + Composer)     │  backend     │
+ *   │ titles by    │                              │  enrichment) │
+ *   │ user name    │                              │              │
+ *   │ Filter:      │                              │ Reads active │
+ *   │ members $in  │                              │ channel from │
+ *   │ ['Keeep']    │                              │ chat context │
  *   └──────────────┴──────────────────────────────┴──────────────┘
  *
- * Channel selection logic: when a channel is selected, derive the
- * "other user" (any member that isn't 'Keeep') and pass their id
- * to the sidebar for enrichment.
+ * Channel selection is driven by Stream's ChatContext (not a parent-prop
+ * callback). The sidebar reads the active channel from useChatContext
+ * directly, so we don't have to thread state through Inbox.
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -35,11 +33,13 @@ import 'stream-chat-react/dist/css/index.css';
 
 import { getStreamClient, disconnectStreamClient } from './streamClient';
 import { api } from './api';
+import SupportChannelPreview from './SupportChannelPreview';
 import UserContextSidebar from './UserContextSidebar';
 
 const KEEEP_USER_ID = 'Keeep';
 
-// Stream channel list filter + sort, memoizable outside the component
+// Stream channel list filter + sort, defined outside the component so the
+// references stay stable across renders (Stream rebuilds the list on change).
 const channelFilters = { type: 'messaging', members: { $in: [KEEEP_USER_ID] } };
 const channelSort = { last_message_at: -1 };
 const channelOptions = { limit: 30, state: true, watch: true, presence: false };
@@ -47,7 +47,6 @@ const channelOptions = { limit: 30, state: true, watch: true, presence: false };
 export default function Inbox() {
     const [client, setClient] = useState(null);
     const [error, setError] = useState(null);
-    const [activeOtherUserId, setActiveOtherUserId] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -74,13 +73,6 @@ export default function Inbox() {
         }
         await disconnectStreamClient();
         window.location.href = '/admin/support/login';
-    }, []);
-
-    const onChannelSelect = useCallback((channel) => {
-        // Pull the non-Keeep member id from the channel state
-        const members = channel.state?.members || {};
-        const otherId = Object.keys(members).find((id) => id !== KEEEP_USER_ID);
-        setActiveOtherUserId(otherId || null);
     }, []);
 
     if (error) {
@@ -121,8 +113,7 @@ export default function Inbox() {
                             filters={channelFilters}
                             sort={channelSort}
                             options={channelOptions}
-                            customActiveChannel={undefined}
-                            onSelect={onChannelSelect}
+                            Preview={SupportChannelPreview}
                         />
                     </div>
                     <div className="admin-support-channel-active">
@@ -135,8 +126,8 @@ export default function Inbox() {
                             <Thread />
                         </Channel>
                     </div>
+                    <UserContextSidebar />
                 </Chat>
-                <UserContextSidebar userId={activeOtherUserId} />
             </div>
         </div>
     );
