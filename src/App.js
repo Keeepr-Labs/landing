@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CookieConsent from 'react-cookie-consent';
 import './App.css';
@@ -8,6 +8,11 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Feedback from './pages/Feedback';
 import WaitlistAndroid from './pages/WaitlistAndroid';
+
+// Lazy-load the admin support app so its ~200KB chat SDK chunk only
+// downloads when someone actually visits /admin/support — landing page
+// bundle is unaffected.
+const AdminSupport = React.lazy(() => import('./pages/admin/support/SupportApp'));
 
 // Home page component
 function Home() {
@@ -105,6 +110,14 @@ function App() {
         <Route path="/terms-of-service" element={<TermsAndConditions />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/waitlistAndroid" element={<WaitlistAndroid />} />
+        <Route
+          path="/admin/support/*"
+          element={
+            <Suspense fallback={<div style={{ padding: 24, fontFamily: '-apple-system, sans-serif' }}>Loading…</div>}>
+              <AdminSupport />
+            </Suspense>
+          }
+        />
       </Routes>
 
       <CookieConsent
