@@ -25,6 +25,15 @@ const TARGET =
     process.env.KEEEP_DEV_API_TARGET || 'https://keeep-9dde9ef1f49f.herokuapp.com';
 
 module.exports = function (app) {
+    // Make the prod default impossible to miss: replies sent from a dev
+    // session reach REAL users. (No staging backend exists today.)
+    console.warn(
+        `\n[setupProxy] /api/admin/support → ${TARGET}` +
+            (process.env.KEEEP_DEV_API_TARGET
+                ? ' (KEEEP_DEV_API_TARGET override)'
+                : ' ⚠ PRODUCTION backend — support replies reach real users. Set KEEEP_DEV_API_TARGET to use a local backend.') +
+            '\n'
+    );
     app.use(
         '/api/admin/support',
         createProxyMiddleware({
