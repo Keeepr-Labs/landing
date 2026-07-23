@@ -1,5 +1,5 @@
 import React, { useState, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import CookieConsent from 'react-cookie-consent';
 import './App.css';
 
@@ -120,6 +120,18 @@ function App() {
         />
       </Routes>
 
+      <MarketingCookieConsent />
+    </Router>
+  );
+}
+
+// GDPR banner for the public marketing pages only. The /admin support tool
+// sets no analytics cookies, and the banner eats half the screen on phones.
+function MarketingCookieConsent() {
+  const location = useLocation();
+  if (location.pathname.startsWith('/admin')) return null;
+
+  return (
       <CookieConsent
         location="bottom"
         buttonText="Accept"
@@ -164,7 +176,6 @@ function App() {
         </Link>{" "}
         for more information.
       </CookieConsent>
-    </Router>
   );
 }
 

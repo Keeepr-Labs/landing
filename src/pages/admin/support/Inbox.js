@@ -28,6 +28,7 @@ import {
     MessageList,
     MessageComposer,
     Thread,
+    useChatContext,
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/index.css';
 
@@ -43,6 +44,55 @@ const KEEEP_USER_ID = 'Keeep';
 const channelFilters = { type: 'messaging', members: { $in: [KEEEP_USER_ID] } };
 const channelSort = { last_message_at: -1 };
 const channelOptions = { limit: 30, state: true, watch: true, presence: false };
+
+// Phone-width check, evaluated once on load. Must match the breakpoint in
+// styles.css that switches the inbox to single-pane navigation.
+const IS_PHONE = window.matchMedia('(max-width: 700px)').matches;
+
+/**
+ * The three inbox panes. Lives inside <Chat> so it can read the active
+ * channel from ChatContext — on phones only one pane shows at a time
+ * (list ⇄ thread, driven by the has-active-channel class), and the back
+ * button clears the active channel to return to the list.
+ */
+function InboxBody() {
+    const { channel, setActiveChannel } = useChatContext();
+    const handleBack = useCallback(() => setActiveChannel(undefined), [setActiveChannel]);
+
+    return (
+        <div
+            className={`admin-support-inbox-body${channel ? ' has-active-channel' : ''}`}
+        >
+            <div className="admin-support-channel-list">
+                <ChannelList
+                    filters={channelFilters}
+                    sort={channelSort}
+                    options={channelOptions}
+                    Preview={SupportChannelPreview}
+                    setActiveChannelOnMount={!IS_PHONE}
+                />
+            </div>
+            <div className="admin-support-channel-active">
+                <Channel>
+                    <Window>
+                        <button
+                            className="admin-support-mobile-back"
+                            onClick={handleBack}
+                            type="button"
+                        >
+                            ‹ All conversations
+                        </button>
+                        <ChannelHeader />
+                        <MessageList />
+                        <MessageComposer />
+                    </Window>
+                    <Thread />
+                </Channel>
+            </div>
+            <UserContextSidebar />
+        </div>
+    );
+}
 
 export default function Inbox() {
     const [client, setClient] = useState(null);
@@ -106,29 +156,9 @@ export default function Inbox() {
                 </button>
             </header>
 
-            <div className="admin-support-inbox-body">
-                <Chat client={client} theme="str-chat__theme-light">
-                    <div className="admin-support-channel-list">
-                        <ChannelList
-                            filters={channelFilters}
-                            sort={channelSort}
-                            options={channelOptions}
-                            Preview={SupportChannelPreview}
-                        />
-                    </div>
-                    <div className="admin-support-channel-active">
-                        <Channel>
-                            <Window>
-                                <ChannelHeader />
-                                <MessageList />
-                                <MessageComposer />
-                            </Window>
-                            <Thread />
-                        </Channel>
-                    </div>
-                    <UserContextSidebar />
-                </Chat>
-            </div>
+            <Chat client={client} theme="str-chat__theme-light">
+                <InboxBody />
+            </Chat>
         </div>
     );
 }

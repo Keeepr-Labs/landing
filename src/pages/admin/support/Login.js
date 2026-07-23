@@ -18,6 +18,7 @@ import { api, AdminApiError } from './api';
 
 export default function Login() {
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -71,15 +72,28 @@ export default function Login() {
                 <h1>Keeep support</h1>
                 <p className="admin-support-login-sub">Sign in to read and reply to user questions.</p>
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        autoFocus
-                        autoComplete="current-password"
-                        disabled={submitting}
-                    />
+                    <div className="admin-support-password-field">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            autoFocus
+                            autoComplete="current-password"
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck={false}
+                            disabled={submitting}
+                        />
+                        <button
+                            type="button"
+                            className="admin-support-password-toggle"
+                            onClick={() => setShowPassword((s) => !s)}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                            {showPassword ? 'Hide' : 'Show'}
+                        </button>
+                    </div>
                     <button type="submit" disabled={submitting || !password}>
                         {submitting ? 'Signing in…' : 'Sign in'}
                     </button>
