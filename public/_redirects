@@ -1,3 +1,8 @@
+# Proxy API calls to the Heroku backend so the admin session cookie is
+# first-party (Safari/iOS block third-party cookies — direct cross-origin
+# calls break the support login on mobile).
+/api/*         https://keeep-9dde9ef1f49f.herokuapp.com/api/:splat  200
+
 /invite        /inviteLink.html    200
 /invitelink    /inviteLink.html    200
 /inviteLink    /inviteLink.html    200

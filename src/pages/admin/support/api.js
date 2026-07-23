@@ -1,15 +1,22 @@
 /**
  * Admin support API client.
  *
+ * Requests are same-origin (`/api/...`), never a direct call to the
+ * Heroku hostname:
+ *   - Production: Netlify proxies /api/* to the backend (public/_redirects),
+ *     so the session cookie is first-party. iOS/macOS Safari drop
+ *     third-party cookies, which is why login silently failed on mobile
+ *     when we hit the Heroku URL cross-origin.
+ *   - Development: CRA's dev-server proxy (package.json "proxy") forwards
+ *     /api/* the same way.
+ *
  * Thin fetch wrapper that ensures:
- *   - credentials: 'include'  (session cookie travels cross-origin)
+ *   - credentials: 'include'  (session cookie on every request)
  *   - X-Admin-Request: 1     (CSRF gate — required by backend middleware)
  *   - JSON in/out
  *
  * Throws on non-2xx with a parsed body for easy error display.
  */
-
-const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
 
 class AdminApiError extends Error {
     constructor(status, body) {
@@ -21,14 +28,7 @@ class AdminApiError extends Error {
 }
 
 async function request(path, options = {}) {
-    if (!API_BASE) {
-        throw new AdminApiError(0, {
-            error: 'config_missing',
-            message: 'REACT_APP_API_BASE_URL is not set',
-        });
-    }
-
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(path, {
         ...options,
         credentials: 'include',
         headers: {
