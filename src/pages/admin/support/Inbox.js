@@ -45,9 +45,32 @@ const channelFilters = { type: 'messaging', members: { $in: [KEEEP_USER_ID] } };
 const channelSort = { last_message_at: -1 };
 const channelOptions = { limit: 30, state: true, watch: true, presence: false };
 
-// Phone-width check, evaluated once on load. Must match the breakpoint in
-// styles.css that switches the inbox to single-pane navigation.
-const IS_PHONE = window.matchMedia('(max-width: 700px)').matches;
+// Must match the breakpoint in styles.css that switches the inbox to
+// single-pane navigation.
+const PHONE_MEDIA_QUERY = '(max-width: 700px)';
+
+/**
+ * Live phone-width check. Tracks the media query (rotation, resize) so
+ * the JS pane logic stays in sync with the CSS breakpoint. Guarded for
+ * environments without matchMedia (jsdom).
+ */
+function useIsPhone() {
+    const [isPhone, setIsPhone] = useState(
+        () =>
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia(PHONE_MEDIA_QUERY).matches
+    );
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return undefined;
+        const mql = window.matchMedia(PHONE_MEDIA_QUERY);
+        const onChange = (e) => setIsPhone(e.matches);
+        mql.addEventListener('change', onChange);
+        return () => mql.removeEventListener('change', onChange);
+    }, []);
+
+    return isPhone;
+}
 
 /**
  * The three inbox panes. Lives inside <Chat> so it can read the active
@@ -57,6 +80,7 @@ const IS_PHONE = window.matchMedia('(max-width: 700px)').matches;
  */
 function InboxBody() {
     const { channel, setActiveChannel } = useChatContext();
+    const isPhone = useIsPhone();
     const handleBack = useCallback(() => setActiveChannel(undefined), [setActiveChannel]);
 
     return (
@@ -69,7 +93,7 @@ function InboxBody() {
                     sort={channelSort}
                     options={channelOptions}
                     Preview={SupportChannelPreview}
-                    setActiveChannelOnMount={!IS_PHONE}
+                    setActiveChannelOnMount={!isPhone}
                 />
             </div>
             <div className="admin-support-channel-active">

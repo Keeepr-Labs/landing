@@ -9,5 +9,20 @@ import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 if (typeof global.TextEncoder === 'undefined') {
     global.TextEncoder = TextEncoder;
+}
+if (typeof global.TextDecoder === 'undefined') {
     global.TextDecoder = TextDecoder;
+}
+
+// jsdom has no matchMedia; the inbox uses it for the phone breakpoint.
+if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
+    window.matchMedia = (query) => ({
+        matches: false,
+        media: query,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+    });
 }

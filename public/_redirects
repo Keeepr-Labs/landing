@@ -1,7 +1,11 @@
-# Proxy API calls to the Heroku backend so the admin session cookie is
-# first-party (Safari/iOS block third-party cookies — direct cross-origin
-# calls break the support login on mobile).
-/api/*         https://keeep-9dde9ef1f49f.herokuapp.com/api/:splat  200
+# Proxy admin-support API calls to the Heroku backend so the admin session
+# cookie is first-party (Safari/iOS block third-party cookies — direct
+# cross-origin calls break the support login on mobile). Scoped to the one
+# path prefix the admin app uses; a blanket /api/* would put the whole
+# backend same-origin with the marketing pages and their cookie. The 200!
+# forces the rewrite even if a static file ever shadows the path.
+# Backend host also appears in src/setupProxy.js and netlify/edge-functions/invite.ts.
+/api/admin/support/*  https://keeep-9dde9ef1f49f.herokuapp.com/api/admin/support/:splat  200!
 
 /invite        /inviteLink.html    200
 /invitelink    /inviteLink.html    200

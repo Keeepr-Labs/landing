@@ -129,7 +129,10 @@ function App() {
 // sets no analytics cookies, and the banner eats half the screen on phones.
 function MarketingCookieConsent() {
   const location = useLocation();
-  if (location.pathname.startsWith('/admin')) return null;
+  // Path-segment match, not a raw prefix — a future marketing route like
+  // /administration-tips must keep its banner.
+  const { pathname } = location;
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return null;
 
   return (
       <CookieConsent

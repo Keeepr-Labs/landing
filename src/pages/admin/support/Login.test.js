@@ -4,19 +4,12 @@ import { MemoryRouter } from 'react-router-dom';
 import Login from './Login';
 import { api } from './api';
 
-jest.mock('./api', () => {
-    class AdminApiError extends Error {
-        constructor(status, body) {
-            super(body?.error || `HTTP ${status}`);
-            this.status = status;
-            this.body = body;
-        }
-    }
-    return {
-        api: { me: jest.fn(), login: jest.fn() },
-        AdminApiError,
-    };
-});
+// Use the real AdminApiError class so this mock can't drift from the
+// real error mapping.
+jest.mock('./api', () => ({
+    api: { me: jest.fn(), login: jest.fn() },
+    AdminApiError: jest.requireActual('./api').AdminApiError,
+}));
 
 beforeEach(() => {
     // Not authenticated — stay on the login screen
@@ -72,4 +65,53 @@ test('wrong password shows the error and clears the field', async () => {
 
     expect(await screen.findByText('Wrong password.')).toBeInTheDocument();
     expect(input).toHaveValue('');
+});
+
+test('rate-limited login shows the 429 message', async () => {
+    const { AdminApiError } = jest.requireMock('./api');
+    api.login.mockRejectedValue(new AdminApiError(429, { error: 'rate_limited' }));
+
+    renderLogin();
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+        target: { value: 'x' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(await screen.findByText(/too many attempts/i)).toBeInTheDocument();
+});
+
+test('network failure shows the unreachable-server message', async () => {
+    const { AdminApiError } = jest.requireMock('./api');
+    api.login.mockRejectedValue(new AdminApiError(0, { error: 'network_error' }));
+
+    renderLogin();
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+        target: { value: 'x' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(
+        await screen.findByText('Could not reach the server.')
+    ).toBeInTheDocument();
+});
+
+test('successful login navigates to the inbox route', async () => {
+    api.login.mockResolvedValue({ stream_token: 't' });
+
+    const { MemoryRouter, Routes, Route } = require('react-router-dom');
+    render(
+        <MemoryRouter initialEntries={['/admin/support/login']}>
+            <Routes>
+                <Route path="/admin/support/login" element={<Login />} />
+                <Route path="/admin/support" element={<div>INBOX_STUB</div>} />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+        target: { value: 'right-one' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(await screen.findByText('INBOX_STUB')).toBeInTheDocument();
 });

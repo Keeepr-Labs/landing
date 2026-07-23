@@ -131,6 +131,12 @@
     border-color: #4524CC;
 }
 
+/* Keyboard users get a real ring, not just a 1px border swap */
+.admin-support-login input:focus-visible {
+    outline: 2px solid #4524CC;
+    outline-offset: 1px;
+}
+
 .admin-support-login input:disabled {
     opacity: 0.6;
 }
@@ -307,6 +313,11 @@
     font-family: inherit;
     text-align: left;
     cursor: pointer;
+}
+
+/* Touch feedback — this button only exists on phones */
+.admin-support-mobile-back:active {
+    background: rgba(69, 36, 204, 0.06);
 }
 
 /* Make Stream's components fill the grid cells */
@@ -509,8 +520,10 @@
    mobile back button (rendered by Inbox.js) returns to the list. */
 
 @media (max-width: 700px) {
+    /* Stay on grid (1 column) rather than display:block so the definite
+       height chain survives and panes scroll internally, not the page. */
     .admin-support-inbox-body {
-        display: block;
+        grid-template-columns: 1fr;
     }
 
     .admin-support-channel-list {

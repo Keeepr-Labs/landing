@@ -12,3 +12,12 @@ test('shows the cookie consent banner on the landing page', () => {
     screen.getByText(/this website uses cookies/i)
   ).toBeInTheDocument();
 });
+
+test('hides the cookie consent banner on /admin routes', () => {
+  window.history.pushState({}, '', '/admin/support/login');
+  render(<App />);
+  expect(
+    screen.queryByText(/this website uses cookies/i)
+  ).not.toBeInTheDocument();
+  window.history.pushState({}, '', '/');
+});
