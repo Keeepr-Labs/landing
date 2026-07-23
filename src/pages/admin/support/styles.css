@@ -514,6 +514,26 @@
     }
 }
 
+/* Stream's stock CSS hides the raw ChannelList below 768px — it goes
+   position:absolute, translateX off-canvas, visibility:hidden and
+   pointer-events:none, waiting for Stream's own ChatView mobile-nav
+   pattern that we don't use. Our single-pane layout controls which pane
+   shows, so put the list back into normal document flow. Uses Stream's
+   767px breakpoint (not our 700px) or 701-767px viewports would show the
+   two-pane layout with an invisible list. */
+
+@media (max-width: 767px) {
+    .admin-support-channel-list .str-chat__channel-list {
+        position: static;
+        visibility: visible;
+        pointer-events: auto;
+        transform: none;
+        transition: none;
+        width: 100%;
+        min-width: 0;
+    }
+}
+
 /* ── Responsive: phones — single-pane list ⇄ thread navigation ──────────
    Breakpoint must match IS_PHONE in Inbox.js. With no active channel the
    list fills the screen; selecting a channel swaps in the thread, and the
