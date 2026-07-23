@@ -64,8 +64,8 @@ export default function ProtectedRoute({ children }) {
                 <h2>Support is unavailable</h2>
                 <p>{errorMessage}</p>
                 <p className="admin-support-state-hint">
-                    Check that the backend is reachable and that <code>REACT_APP_API_BASE_URL</code>{' '}
-                    is set correctly.
+                    Check that the backend is up and that the <code>/api/*</code> proxy in{' '}
+                    <code>public/_redirects</code> points at it.
                 </p>
             </div>
         );

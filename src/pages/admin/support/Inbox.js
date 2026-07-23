@@ -28,6 +28,7 @@ import {
     MessageList,
     MessageComposer,
     Thread,
+    useChatContext,
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/index.css';
 
@@ -43,6 +44,79 @@ const KEEEP_USER_ID = 'Keeep';
 const channelFilters = { type: 'messaging', members: { $in: [KEEEP_USER_ID] } };
 const channelSort = { last_message_at: -1 };
 const channelOptions = { limit: 30, state: true, watch: true, presence: false };
+
+// Must match the breakpoint in styles.css that switches the inbox to
+// single-pane navigation.
+const PHONE_MEDIA_QUERY = '(max-width: 700px)';
+
+/**
+ * Live phone-width check. Tracks the media query (rotation, resize) so
+ * the JS pane logic stays in sync with the CSS breakpoint. Guarded for
+ * environments without matchMedia (jsdom).
+ */
+function useIsPhone() {
+    const [isPhone, setIsPhone] = useState(
+        () =>
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia(PHONE_MEDIA_QUERY).matches
+    );
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return undefined;
+        const mql = window.matchMedia(PHONE_MEDIA_QUERY);
+        const onChange = (e) => setIsPhone(e.matches);
+        mql.addEventListener('change', onChange);
+        return () => mql.removeEventListener('change', onChange);
+    }, []);
+
+    return isPhone;
+}
+
+/**
+ * The three inbox panes. Lives inside <Chat> so it can read the active
+ * channel from ChatContext — on phones only one pane shows at a time
+ * (list ⇄ thread, driven by the has-active-channel class), and the back
+ * button clears the active channel to return to the list.
+ */
+function InboxBody() {
+    const { channel, setActiveChannel } = useChatContext();
+    const isPhone = useIsPhone();
+    const handleBack = useCallback(() => setActiveChannel(undefined), [setActiveChannel]);
+
+    return (
+        <div
+            className={`admin-support-inbox-body${channel ? ' has-active-channel' : ''}`}
+        >
+            <div className="admin-support-channel-list">
+                <ChannelList
+                    filters={channelFilters}
+                    sort={channelSort}
+                    options={channelOptions}
+                    Preview={SupportChannelPreview}
+                    setActiveChannelOnMount={!isPhone}
+                />
+            </div>
+            <div className="admin-support-channel-active">
+                <Channel>
+                    <Window>
+                        <button
+                            className="admin-support-mobile-back"
+                            onClick={handleBack}
+                            type="button"
+                        >
+                            ‹ All conversations
+                        </button>
+                        <ChannelHeader />
+                        <MessageList />
+                        <MessageComposer />
+                    </Window>
+                    <Thread />
+                </Channel>
+            </div>
+            <UserContextSidebar />
+        </div>
+    );
+}
 
 export default function Inbox() {
     const [client, setClient] = useState(null);
@@ -106,29 +180,9 @@ export default function Inbox() {
                 </button>
             </header>
 
-            <div className="admin-support-inbox-body">
-                <Chat client={client} theme="str-chat__theme-light">
-                    <div className="admin-support-channel-list">
-                        <ChannelList
-                            filters={channelFilters}
-                            sort={channelSort}
-                            options={channelOptions}
-                            Preview={SupportChannelPreview}
-                        />
-                    </div>
-                    <div className="admin-support-channel-active">
-                        <Channel>
-                            <Window>
-                                <ChannelHeader />
-                                <MessageList />
-                                <MessageComposer />
-                            </Window>
-                            <Thread />
-                        </Channel>
-                    </div>
-                    <UserContextSidebar />
-                </Chat>
-            </div>
+            <Chat client={client} theme="str-chat__theme-light">
+                <InboxBody />
+            </Chat>
         </div>
     );
 }
