@@ -5,6 +5,34 @@ inbox at `/admin/support` (Stream Chat; backend is the separate Keeep-backend
 repo on Heroku, reached via the `/api/admin/support/*` proxy in
 `public/_redirects` for prod and `src/setupProxy.js` for dev).
 
+## Landing page (`/`)
+
+`src/pages/Landing/` — a value/feature page, not a waitlist capture. The iOS
+app is live, so the primary CTA is the App Store listing
+(`apps.apple.com/app/id6471142186`); Android still routes to
+`/waitlistAndroid`.
+
+- `Landing.js` — section composition and all marketing copy
+- `AppScreens.js` — the in-app screens rebuilt in HTML/CSS (pace arc, group
+  chat, pledge tickets, commitment card, goal setup) so they stay crisp and
+  responsive instead of shipping screenshots. Swap a component body for an
+  `<img>` if you ever get Figma exports.
+- `useReveal.js` — one-shot scroll reveal; falls back to "already revealed"
+  when IntersectionObserver is missing so content never depends on an effect
+- Copy voice and the narrative order come from the Keeep-mobile repo:
+  `docs/brand-guidelines.md`, `newUserIntro/config.tsx` and
+  `screens/onboarding/*`. Design tokens mirror `utils/ColorsAndFonts.ts` and
+  `DESIGN.md` (light mode only).
+
+Two gotchas worth keeping in mind:
+
+- Element resets inside `.k-landing` are wrapped in `:where()` on purpose.
+  Plain `.k-landing h2 { margin: 0 }` outranks the section classes and
+  silently flattens every heading margin on the page.
+- `body, html { overflow-x: hidden }` in `App.css` makes **body** the scroll
+  container, so `window.scrollTo` is a no-op. Don't add `overflow-x` to
+  `.k-landing` — it computes `overflow-y: auto` and nests a second scroller.
+
 ## Deploy Configuration
 
 - Platform: netlify (project "getkeeep")

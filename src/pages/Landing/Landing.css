@@ -1,0 +1,1822 @@
+/* ==========================================================================
+   Keeep landing page
+   Tokens mirror Keeep-mobile/utils/ColorsAndFonts.ts. Surface hierarchy,
+   spacing, radii and shadow tiers follow DESIGN.md. Light mode only, as the
+   design system specifies.
+   Manrope @font-face declarations live in src/App.css and are loaded app-wide.
+   ========================================================================== */
+
+.k-landing {
+  /* Purple */
+  --primary-darker: #221266;
+  --primary-dark: #341b99;
+  --primary-default: #4524cc;
+  --primary-light: #745bd9;
+  --primary-lighter: #a291e6;
+  --primary-lightest: #c7bdf0;
+  --primary-lightest-2: #e5e1f5;
+  --primary-lightest-3: #f7f5ff;
+
+  /* Neutrals */
+  --grey-900: #201b33;
+  --grey-600: #6b6779;
+  --grey-500: #928e9e;
+  --grey-400: #c4c0d1;
+  --grey-300: #dddae5;
+  --grey-200: #e9e6f0;
+  --grey-100: #f4f2f7;
+  --grey-50: #fbfafc;
+  --white: #ffffff;
+
+  /* Text */
+  --text-primary: #201b33;
+  /* DESIGN.md's textDarkSecondary is rgba(32,27,51,0.6), which measures
+     4.42:1 on white — just under the 4.5:1 AA floor for body text. Nudged to
+     0.66 (5.4:1 on white, 4.8:1 on grey-100) since this page is long-form
+     reading, unlike the app's short labels. */
+  --text-secondary: rgba(32, 27, 51, 0.66);
+  --text-tertiary: rgba(32, 27, 51, 0.36);
+  --text-on-dark: rgba(255, 255, 255, 0.78);
+
+  /* Pace accents */
+  --green-accent-dark: #35a977;
+  --green-accent-bg: rgba(102, 235, 177, 0.2);
+  --yellow-accent-dark: #efb000;
+  --yellow-accent-bg: rgba(255, 213, 98, 0.2);
+  --orange-accent-dark: #fe6b00;
+  --orange-accent-bg: rgba(255, 165, 0, 0.2);
+  --red-accent-dark: #ff3527;
+  --red-accent-bg: rgba(245, 80, 70, 0.25);
+
+  /* Rhythm */
+  --gutter: 24px;
+  --maxw: 1140px;
+  --section-y: clamp(72px, 10vw, 136px);
+
+  /* Radii */
+  --r-card: 20px;
+  --r-card-lg: 24px;
+  --r-pill: 32px;
+
+  font-family: 'Manrope-Regular', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  background: var(--white);
+  /* No overflow-x here on purpose: `overflow-x: hidden` would compute
+     `overflow-y` to `auto` and turn this wrapper into a second scroll
+     container nested inside the one `body, html` already creates in
+     App.css — which breaks sticky positioning and scroll anchoring.
+     Horizontal bleed is clipped by the sections that cause it instead. */
+}
+
+.k-landing *,
+.k-landing *::before,
+.k-landing *::after {
+  box-sizing: border-box;
+}
+
+/* Element resets are wrapped in :where() so they carry zero specificity.
+   Written as plain `.k-landing h2 { margin: 0 }` they outrank the section
+   classes below (0,1,1 vs 0,1,0) and silently flatten every heading and
+   paragraph margin on the page. */
+:where(.k-landing) :where(h1, h2, h3) {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+:where(.k-landing) :where(p) {
+  margin: 0;
+}
+
+:where(.k-landing) :where(ul, ol) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Shared inner container */
+.k-hero__inner,
+.k-premise__inner,
+.k-problem__inner,
+.k-secret__inner,
+.k-feature__inner,
+.k-coach__inner,
+.k-how__inner,
+.k-diff__inner,
+.k-price__inner,
+.k-faq__inner,
+.k-final__inner,
+.k-footer__inner,
+.k-nav__inner {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+/* Overline — the signature Keeep label: 11px, wide tracking, uppercase */
+.k-hero__eyebrow,
+.k-secret__eyebrow,
+.k-feature__eyebrow,
+.k-coach__eyebrow,
+.k-price__eyebrow,
+.k-screen__eyebrow,
+.k-workout__overline,
+.k-commit__overline,
+.k-pledge__overline,
+.k-goal__overline {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 1.32px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------- reveal motion
+   Sections translate up and fade in once. Motion is opt-out: reduced-motion
+   visitors get the final state with no transition, and because `.k-reveal`
+   is only hidden while a transition is possible, text is never trapped
+   behind an effect that did not run. */
+main > * {
+  scroll-margin-top: 72px;
+}
+
+.k-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.k-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k-landing * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .k-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------------ nav */
+.k-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--primary-default);
+}
+
+.k-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+}
+
+.k-nav__brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.k-nav__logo {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+.k-nav__beta {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-lightest);
+  padding-top: 2px;
+}
+
+.k-nav__cta {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--primary-default);
+  background: var(--white);
+  padding: 9px 18px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.k-nav__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(34, 18, 102, 0.28);
+}
+
+/* ----------------------------------------------------------------------- CTAs */
+.k-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 15px 28px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.k-cta__icon {
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.k-cta--solid {
+  background: var(--white);
+  color: var(--primary-default);
+  box-shadow: 0 10px 30px rgba(34, 18, 102, 0.32);
+}
+
+.k-cta--light {
+  background: var(--primary-default);
+  color: var(--white);
+  box-shadow: 0 10px 30px rgba(69, 36, 204, 0.3);
+}
+
+.k-cta:hover {
+  transform: translateY(-2px);
+}
+
+.k-cta--solid:hover {
+  box-shadow: 0 16px 40px rgba(34, 18, 102, 0.4);
+}
+
+.k-cta--light:hover {
+  box-shadow: 0 16px 40px rgba(69, 36, 204, 0.42);
+}
+
+/* Visible keyboard focus everywhere */
+.k-landing a:focus-visible,
+.k-landing summary:focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.k-hero a:focus-visible,
+.k-final a:focus-visible {
+  outline-color: var(--white);
+}
+
+.k-android {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-on-dark);
+  margin: 0;
+}
+
+.k-android__link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.k-final .k-android {
+  color: var(--text-secondary);
+}
+
+/* ---------------------------------------------------------------------- hero */
+.k-hero {
+  position: relative;
+  background: linear-gradient(160deg, var(--primary-default) 0%, var(--primary-darker) 100%);
+  color: var(--white);
+  padding-block: clamp(56px, 8vw, 104px) 0;
+  overflow: hidden;
+}
+
+.k-hero__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.k-hero__twirl {
+  position: absolute;
+  top: -10%;
+  right: -22%;
+  width: min(900px, 105vw);
+  opacity: 0.16;
+}
+
+.k-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+
+.k-hero__eyebrow {
+  color: var(--primary-lightest);
+  margin-bottom: 16px;
+}
+
+.k-hero__title {
+  font-size: clamp(3.25rem, 9vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  margin-bottom: 20px;
+}
+
+.k-hero__lede {
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.62;
+  color: var(--text-on-dark);
+  max-width: 46ch;
+  margin-bottom: 32px;
+}
+
+.k-hero__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.k-hero__proof {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-on-dark);
+  padding-bottom: clamp(48px, 7vw, 88px);
+}
+
+.k-hero__proof li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.k-hero__device {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  align-self: end;
+}
+
+/* ------------------------------------------------------------------- premise */
+.k-premise {
+  background: var(--white);
+  padding-block: var(--section-y);
+  text-align: center;
+}
+
+.k-premise__title {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  line-height: 1.12;
+  max-width: 24ch;
+  margin: 0 auto clamp(32px, 4vw, 48px);
+}
+
+.k-premise__title em {
+  font-style: normal;
+  color: var(--primary-default);
+}
+
+.k-beats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 780px;
+  margin: 0 auto 32px;
+}
+
+.k-beat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Manrope-Medium', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-primary);
+  background: var(--primary-lightest-3);
+  border: 1px solid var(--primary-lightest-2);
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  /* Staggered so the benefits land one at a time, like onboarding slide 3 */
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity 460ms ease, transform 460ms ease;
+  transition-delay: calc(var(--i) * 110ms + 160ms);
+}
+
+.k-premise.is-in .k-beat {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k-beat {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.k-beat__emoji {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.k-premise__kicker {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------------- problem */
+.k-problem {
+  background: var(--grey-100);
+  padding-block: var(--section-y);
+}
+
+.k-problem__title {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  line-height: 1.12;
+  margin-bottom: clamp(28px, 3.5vw, 40px);
+  max-width: 20ch;
+}
+
+.k-problem__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(20px, 3vw, 40px);
+  margin-bottom: clamp(32px, 4vw, 48px);
+}
+
+.k-problem__text {
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.k-problem__pull {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+  line-height: 1.35;
+  color: var(--primary-default);
+  max-width: 28ch;
+}
+
+/* -------------------------------------------------------------------- secret */
+.k-secret {
+  background: var(--white);
+  padding-block: var(--section-y);
+  text-align: center;
+}
+
+.k-secret__eyebrow {
+  color: var(--primary-default);
+  margin-bottom: 14px;
+}
+
+.k-secret__title {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  line-height: 1.12;
+  margin-bottom: clamp(36px, 4.5vw, 56px);
+}
+
+.k-secret__cards {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 20px;
+}
+
+.k-secret__plus {
+  align-self: center;
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 32px;
+  color: var(--primary-lighter);
+  flex: 0 0 auto;
+}
+
+.k-icard {
+  flex: 1 1 0;
+  max-width: 360px;
+  text-align: left;
+  background: var(--primary-lightest-3);
+  border: 1px solid var(--primary-lightest-2);
+  border-radius: var(--r-card-lg);
+  padding: 28px 24px;
+}
+
+.k-icard__emoji {
+  display: block;
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.k-icard__title {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 6px;
+}
+
+.k-icard__text {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------------ features */
+.k-feature {
+  padding-block: var(--section-y);
+}
+
+.k-feature--accountability {
+  background: var(--white);
+}
+
+.k-feature--stakes {
+  background: linear-gradient(180deg, var(--primary-lightest-3) 0%, var(--white) 100%);
+}
+
+.k-feature__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 72px);
+  align-items: center;
+}
+
+.k-feature__inner--reverse .k-feature__copy {
+  order: 2;
+}
+
+.k-feature__eyebrow {
+  color: var(--primary-default);
+  margin-bottom: 14px;
+}
+
+.k-feature__title {
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  line-height: 1.16;
+  margin-bottom: 16px;
+}
+
+.k-feature__pull {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  line-height: 1.34;
+  color: var(--primary-default);
+  margin-bottom: 20px;
+}
+
+.k-feature__text {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  max-width: 48ch;
+}
+
+.k-feature__text--small {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.k-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.k-list li {
+  display: flex;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-primary);
+}
+
+.k-feature__device {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.k-feature__deco {
+  position: absolute;
+  bottom: -24px;
+  left: -8px;
+  width: min(150px, 34%);
+  pointer-events: none;
+  filter: drop-shadow(0 12px 24px rgba(32, 27, 51, 0.16));
+}
+
+/* Stakes section: one phone in flow, commitment card floating over its
+   lower-right corner. The card is the payoff object, so it sits in front. */
+.k-feature__device--stack {
+  position: relative;
+  padding-bottom: 48px;
+}
+
+.k-feature__device--stack .k-phone {
+  transform: rotate(-2.5deg);
+}
+
+.k-commit-float {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(268px, 68%);
+  transform: rotate(5deg);
+  filter: drop-shadow(0 20px 36px rgba(32, 27, 51, 0.3));
+  z-index: 3;
+}
+
+/* --------------------------------------------------------------------- coach */
+.k-coach {
+  background: var(--grey-100);
+  padding-block: var(--section-y);
+}
+
+.k-coach__eyebrow {
+  color: var(--primary-default);
+  margin-bottom: 14px;
+}
+
+.k-coach__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.14;
+  margin-bottom: 16px;
+  max-width: 26ch;
+}
+
+.k-coach__text {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-secondary);
+  max-width: 54ch;
+  margin-bottom: clamp(32px, 4vw, 44px);
+}
+
+.k-tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.k-tier {
+  background: var(--white);
+  border: 1px solid var(--grey-300);
+  border-left: 4px solid var(--tier-color);
+  border-radius: var(--r-card);
+  padding: 20px;
+}
+
+.k-tier__chip {
+  display: inline-block;
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 1.32px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  /* Accent-coloured text on its own accent tint reads at 1.8-2.7:1. The
+     tier's colour still comes through via the tint and the card's left
+     border; the label itself stays ink so it is actually legible. */
+  color: var(--grey-900);
+}
+
+.k-tier__msg {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ----------------------------------------------------------------------- how */
+.k-how {
+  background: var(--white);
+  padding-block: var(--section-y);
+}
+
+.k-how__head {
+  max-width: 640px;
+  margin-bottom: clamp(36px, 4.5vw, 56px);
+}
+
+.k-how__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.14;
+  margin-bottom: 14px;
+}
+
+.k-how__sub {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.k-how__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(36px, 5vw, 64px);
+  align-items: start;
+}
+
+.k-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  counter-reset: step;
+}
+
+.k-step {
+  display: flex;
+  gap: 18px;
+}
+
+.k-step__n {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-lightest-2);
+  color: var(--primary-default);
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 15px;
+}
+
+.k-step__title {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 6px;
+}
+
+.k-step__text {
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--text-secondary);
+  max-width: 44ch;
+}
+
+.k-how__device {
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------- difference */
+.k-diff {
+  background: var(--primary-darker);
+  color: var(--white);
+  padding-block: var(--section-y);
+}
+
+.k-diff__title {
+  font-size: clamp(1.875rem, 3.8vw, 2.875rem);
+  line-height: 1.16;
+  margin-bottom: 16px;
+  max-width: 30ch;
+}
+
+.k-diff__text {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-on-dark);
+  max-width: 54ch;
+  margin-bottom: clamp(32px, 4vw, 44px);
+}
+
+.k-diff__rows {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.k-diff__row {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.k-diff__them {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--primary-lightest);
+}
+
+.k-diff__line {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-on-dark);
+}
+
+.k-diff__row--us .k-diff__them {
+  color: var(--white);
+}
+
+.k-diff__row--us .k-diff__line {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  color: var(--white);
+}
+
+/* ------------------------------------------------------------------- pricing */
+.k-price {
+  background: var(--white);
+  padding-block: var(--section-y);
+  text-align: center;
+}
+
+.k-price__eyebrow {
+  color: var(--primary-default);
+  margin-bottom: 14px;
+}
+
+.k-price__title {
+  font-size: clamp(2rem, 4.2vw, 3.125rem);
+  line-height: 1.14;
+  margin-bottom: 18px;
+}
+
+.k-price__text {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--text-secondary);
+  max-width: 52ch;
+  margin: 0 auto 20px;
+}
+
+.k-price__kicker {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: clamp(1.0625rem, 1.8vw, 1.375rem);
+  line-height: 1.45;
+  color: var(--primary-default);
+  max-width: 34ch;
+  margin: 0 auto;
+}
+
+/* ----------------------------------------------------------------------- faq */
+.k-faq {
+  background: var(--grey-100);
+  padding-block: var(--section-y);
+}
+
+.k-faq__title {
+  font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+  line-height: 1.16;
+  margin-bottom: clamp(28px, 3.5vw, 40px);
+}
+
+.k-faq__list {
+  max-width: 780px;
+}
+
+.k-faq__item {
+  background: var(--white);
+  border: 1px solid var(--grey-300);
+  border-radius: var(--r-card);
+  padding: 4px 20px;
+  margin-bottom: 12px;
+}
+
+.k-faq__q {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 26px;
+  padding: 16px 0;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.k-faq__q::-webkit-details-marker {
+  display: none;
+}
+
+.k-faq__q::after {
+  content: '+';
+  font-size: 22px;
+  line-height: 1;
+  color: var(--primary-default);
+  flex: 0 0 auto;
+  transition: transform 200ms ease;
+}
+
+.k-faq__item[open] .k-faq__q::after {
+  transform: rotate(45deg);
+}
+
+.k-faq__a {
+  font-size: 16px;
+  line-height: 1.66;
+  color: var(--text-secondary);
+  padding: 0 0 18px;
+  max-width: 62ch;
+}
+
+/* --------------------------------------------------------------- final + CTA */
+.k-final {
+  background: var(--primary-lightest-3);
+  padding-block: var(--section-y);
+  text-align: center;
+}
+
+.k-final__title {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.08;
+  margin-bottom: 18px;
+}
+
+.k-final__text {
+  font-size: clamp(1rem, 1.4vw, 1.1875rem);
+  line-height: 1.66;
+  color: var(--text-secondary);
+  max-width: 44ch;
+  margin: 0 auto clamp(28px, 3.5vw, 36px);
+}
+
+.k-final__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(32px, 4vw, 44px);
+}
+
+.k-final__signoff {
+  font-family: 'Manrope-Medium', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------- footer */
+.k-footer {
+  background: var(--primary-darker);
+  color: var(--white);
+  padding-block: 40px;
+}
+
+.k-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.k-footer__logo {
+  height: 22px;
+  width: auto;
+  opacity: 0.9;
+}
+
+.k-footer__links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.k-footer__link {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-on-dark);
+  text-decoration: none;
+}
+
+.k-footer__link:hover {
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.k-footer__sep {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* =========================================================== responsive ==== */
+
+@media (max-width: 1024px) {
+  .k-hero__inner,
+  .k-feature__inner,
+  .k-how__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .k-hero__inner {
+    text-align: left;
+  }
+
+  .k-hero__proof {
+    padding-bottom: 40px;
+  }
+
+  .k-feature__inner--reverse .k-feature__copy {
+    order: 0;
+  }
+
+  .k-how__device {
+    order: -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .k-landing {
+    --gutter: 16px;
+  }
+
+  .k-secret__cards {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .k-icard {
+    max-width: none;
+  }
+
+  .k-secret__plus {
+    align-self: center;
+  }
+
+  .k-diff__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .k-feature__deco {
+    width: 108px;
+    bottom: -16px;
+    left: -4px;
+  }
+
+  .k-commit-float {
+    width: min(212px, 72%);
+    right: -8px;
+  }
+
+  .k-footer__inner {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   Phone frame + in-app screen recreations
+   Structure follows the real components; see AppScreens.js for the mapping.
+   ========================================================================== */
+
+.k-phone {
+  width: min(320px, 82vw);
+  flex: 0 0 auto;
+}
+
+.k-phone__frame {
+  position: relative;
+  aspect-ratio: 320 / 660;
+  border-radius: 46px;
+  padding: 10px;
+  background: linear-gradient(160deg, #2c2740 0%, #14101f 100%);
+  box-shadow: 0 30px 70px rgba(20, 16, 31, 0.42),
+    0 4px 12px rgba(20, 16, 31, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.k-phone__notch {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 86px;
+  height: 22px;
+  border-radius: 12px;
+  background: #14101f;
+  z-index: 3;
+}
+
+.k-phone__screen {
+  position: relative;
+  height: 100%;
+  border-radius: 38px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.k-screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------- screen: group header */
+.k-screen--progress {
+  background: linear-gradient(170deg, var(--primary-default) 0%, var(--primary-darker) 100%);
+  padding: 46px 12px 12px;
+  gap: 10px;
+}
+
+.k-screen__card--top {
+  padding: 12px 14px 16px;
+  border-radius: var(--r-card);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: center;
+}
+
+.k-screen__eyebrow {
+  color: var(--primary-lightest);
+  margin-bottom: 6px;
+}
+
+.k-screen__eyebrow--dark {
+  color: var(--primary-default);
+  text-align: left;
+}
+
+.k-arcwrap {
+  position: relative;
+  width: 140px;
+  margin: 2px auto 0;
+}
+
+.k-arc {
+  display: block;
+}
+
+/* The arc sweeps in when the hero mounts — one flourish, then stillness. */
+.k-arc__progress {
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: k-arc-draw 1100ms cubic-bezier(0.22, 1, 0.36, 1) 260ms forwards;
+}
+
+@keyframes k-arc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.k-arcwrap__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  text-align: center;
+}
+
+.k-arcwrap__count {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  color: var(--white);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.k-arcwrap__done {
+  font-size: 34px;
+}
+
+.k-arcwrap__sep,
+.k-arcwrap__goal {
+  font-size: 18px;
+  color: var(--primary-lightest);
+}
+
+.k-arcwrap__label {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--primary-lightest);
+  margin-top: 3px;
+}
+
+.k-pacemeter {
+  font-family: 'Manrope-Medium', system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 15px;
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.k-counters {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.k-counter {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 8px;
+  text-align: left;
+}
+
+.k-counter__icon {
+  font-size: 13px;
+}
+
+.k-counter__num {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 17px;
+  color: var(--white);
+}
+
+.k-counter__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.12;
+}
+
+.k-counter__main {
+  font-size: 9px;
+  color: var(--white);
+}
+
+.k-counter__sub {
+  font-size: 9px;
+  color: var(--primary-lightest);
+}
+
+.k-screen__card--bottom {
+  flex: 1 1 auto;
+  background: var(--white);
+  border-radius: var(--r-card);
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.k-people {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.k-person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.k-person:last-child {
+  border-bottom: 0;
+}
+
+.k-person__avatar {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-lightest-2);
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.k-person__name {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--text-primary);
+  flex: 1 1 auto;
+}
+
+.k-person__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.k-person__count {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* --------------------------------------------------------------- screen: chat */
+.k-screen--chat {
+  background: var(--grey-50);
+  padding-top: 46px;
+}
+
+.k-chat__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px 10px;
+  background: var(--primary-lightest-2);
+  border-bottom: 1px solid var(--primary-lightest);
+}
+
+.k-chat__title {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--primary-default);
+}
+
+.k-chat__meta {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.k-chat__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.k-msg {
+  max-width: 82%;
+  border-radius: 14px;
+  padding: 8px 11px;
+}
+
+.k-msg--in {
+  align-self: flex-start;
+  background: var(--white);
+  border: 1px solid var(--grey-300);
+  border-bottom-left-radius: 4px;
+}
+
+.k-msg--out {
+  align-self: flex-end;
+  background: var(--primary-default);
+  border-bottom-right-radius: 4px;
+}
+
+.k-msg__who {
+  display: block;
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  margin-bottom: 2px;
+}
+
+.k-msg__text {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--text-primary);
+}
+
+.k-msg--out .k-msg__text {
+  color: var(--white);
+}
+
+/* NewWorkoutMessage */
+.k-workout {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--grey-900);
+  box-shadow: 0 6px 18px rgba(32, 27, 51, 0.18);
+}
+
+.k-workout__overlay {
+  /* Stands in for the workout photo + rgba(0,0,0,0.4) scrim */
+  background: linear-gradient(140deg, #4a3f7a 0%, #241d3d 100%);
+  padding: 12px 12px 14px;
+}
+
+.k-workout__overline {
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.k-workout__who {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 17px;
+  color: var(--white);
+}
+
+.k-workout__metrics {
+  padding: 10px 12px 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.k-workout__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--green-accent-dark);
+  background: var(--green-accent-bg);
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-bottom: 10px;
+}
+
+.k-workout__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px 12px;
+}
+
+.k-workout__label {
+  font-size: 9px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 1px;
+}
+
+.k-workout__value {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--white);
+}
+
+.k-workout__reactions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px 10px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.k-workout__reactions span {
+  font-size: 10px;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 3px 8px;
+}
+
+/* --------------------------------------------------------- screen: commitment */
+.k-screen--commit {
+  background: linear-gradient(180deg, var(--primary-lightest-3) 0%, var(--grey-200) 100%);
+  padding: 58px 18px 22px;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* The metallic commitment card — DESIGN.md reserves this treatment for the
+   rare high-impact moment, so it is the one loud object on the page. */
+.k-commit {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-card-lg);
+  padding: 22px 18px;
+  text-align: center;
+  background: linear-gradient(145deg, #f3f2f7 0%, #cfcbdd 26%, #ffffff 48%, #c8c4d6 74%, #eceaf2 100%);
+  box-shadow: 0 18px 38px rgba(32, 27, 51, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(32, 27, 51, 0.16);
+}
+
+.k-commit__sheen {
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 40%;
+  height: 220%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  transform: rotate(15deg);
+  animation: k-sheen 4.2s ease-in-out 1.2s infinite;
+}
+
+@keyframes k-sheen {
+  0% {
+    left: -40%;
+  }
+  55%,
+  100% {
+    left: 130%;
+  }
+}
+
+.k-commit__overline {
+  color: var(--grey-900);
+  margin-bottom: 10px;
+}
+
+.k-commit__overline--by {
+  margin-bottom: 4px;
+}
+
+.k-commit__number {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 54px;
+  line-height: 1;
+  color: var(--grey-900);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.95), 0 -1px 0 rgba(32, 27, 51, 0.28);
+}
+
+.k-commit__unit {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--grey-600);
+  margin-top: 4px;
+}
+
+.k-commit__rule {
+  height: 1px;
+  margin: 14px 0;
+  background: linear-gradient(90deg, transparent, rgba(32, 27, 51, 0.22), transparent);
+}
+
+.k-commit__date {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 17px;
+  color: var(--grey-900);
+}
+
+.k-commit__caption {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- screen: pledge */
+.k-screen--pledge {
+  background: linear-gradient(180deg, var(--white) 0%, var(--grey-200) 100%);
+  padding: 58px 18px 22px;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.k-pledge__overline {
+  color: var(--grey-900);
+}
+
+.k-tickets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.k-ticket {
+  display: flex;
+  align-items: stretch;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--primary-lightest);
+  box-shadow: 0 8px 20px rgba(32, 27, 51, 0.14);
+  transform: rotate(calc((var(--n) - 0.5) * 1.1deg));
+}
+
+.k-ticket__stub {
+  flex: 0 0 auto;
+  width: 46px;
+  display: grid;
+  place-items: center;
+  background: var(--primary-default);
+  /* Perforation between stub and body */
+  border-right: 2px dashed rgba(255, 255, 255, 0.55);
+}
+
+.k-ticket__emoji {
+  font-size: 20px;
+}
+
+.k-ticket__body {
+  flex: 1 1 auto;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.k-ticket__label {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--primary-default);
+  margin-bottom: 2px;
+}
+
+.k-ticket__worth {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.k-pledge__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--primary-lightest-3);
+  border: 1px dashed var(--primary-lightest);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 4px;
+}
+
+.k-pledge__total-label {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--grey-600);
+}
+
+.k-pledge__total-value {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 19px;
+  color: var(--primary-default);
+}
+
+.k-pledge__stakes {
+  margin-top: 4px;
+}
+
+.k-pledge__line {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--text-primary);
+}
+
+.k-pledge__line strong {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.k-pledge__line--muted {
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------- screen: goal */
+.k-screen--goal {
+  background: linear-gradient(180deg, var(--white) 0%, var(--grey-200) 100%);
+  padding: 58px 18px 22px;
+  text-align: center;
+  gap: 4px;
+}
+
+.k-goal__title {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 19px;
+  color: var(--text-primary);
+}
+
+.k-goal__sub {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+.k-goal__total {
+  background: var(--primary-lightest-3);
+  border: 1px solid var(--primary-lightest-2);
+  border-radius: var(--r-card);
+  padding: 16px 12px;
+  margin-bottom: 14px;
+}
+
+.k-goal__number {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 46px;
+  line-height: 1;
+  color: var(--primary-default);
+}
+
+.k-goal__unit {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--grey-600);
+  margin-top: 6px;
+}
+
+.k-goal__pacer {
+  background: var(--white);
+  border: 1px solid var(--grey-300);
+  border-radius: var(--r-card);
+  padding: 14px 12px;
+}
+
+.k-goal__overline {
+  color: var(--primary-default);
+  margin-bottom: 10px;
+}
+
+.k-goal__stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.k-goal__btn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-lightest-2);
+  color: var(--primary-default);
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 17px;
+  flex: 0 0 auto;
+}
+
+.k-goal__value {
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 26px;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.k-goal__per {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.k-goal__bars {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.k-goal__bar {
+  width: 16px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--grey-300);
+}
+
+.k-goal__bar.is-on {
+  background: var(--primary-default);
+}
+
+/* Goal screen footer — mirrors the real screen's pinned primary action. */
+.k-goal__note {
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--text-tertiary);
+  margin-top: 14px;
+}
+
+.k-goal__button {
+  margin-top: auto;
+  background: var(--primary-default);
+  color: var(--white);
+  font-family: 'Manrope-SemiBold', system-ui, sans-serif;
+  font-size: 14px;
+  text-align: center;
+  padding: 13px;
+  border-radius: var(--r-pill);
+  box-shadow: 0 6px 16px rgba(69, 36, 204, 0.3);
+}
