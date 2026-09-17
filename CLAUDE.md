@@ -31,6 +31,23 @@ Apple Health → backed by science → recurring monthly rounds → setup.
   could not reach PubMed) — verify before a big push.
 - `useReveal.js` — one-shot scroll reveal; falls back to "already revealed"
   when IntersectionObserver is missing so content never depends on an effect
+- `useSequence.js` — steps a scene (the animated chats, the live pacer) on a
+  timer once its section is revealed; returns the final step immediately
+  under `prefers-reduced-motion`. `useParallax.js` drifts `[data-parallax]`
+  elements on scroll; off for reduced motion and touch. Both listen to the
+  body scroller via capture-phase `scroll` (see gotcha below).
+- Copy budget: every supporting line carries `.k-line` and the test caps it
+  at 120 characters. Headline + one line per section, like Opal.
+- Photography: `PHOTOS` at the top of `Landing.js` — each slot renders an
+  on-brand textured tile until a `src` is set. Stock hosts were unreachable
+  from the build sandbox; Unsplash/Pexels licences allow use without credit.
+- Institution logos: `INSTITUTIONS` in `AppScreens.js` renders wordmarks;
+  set `logo` to an SVG path once you have permission to use the mark.
+- The brand scribble (`public/images/scribble.png`, from the app's
+  `goalCardBackground.png`) is handed to CSS as `--scribble` from
+  `Landing.js`, because css-loader would try to bundle a root-relative
+  `url()`. Its clear area carries a faint tint: use it with
+  `mix-blend-mode: multiply`, never `screen`.
 - Copy voice and the narrative order come from the Keeep-mobile repo:
   `docs/brand-guidelines.md`, `newUserIntro/config.tsx` and
   `screens/onboarding/*`. Design tokens mirror `utils/ColorsAndFonts.ts` and
@@ -38,6 +55,9 @@ Apple Health → backed by science → recurring monthly rounds → setup.
 
 Two gotchas worth keeping in mind:
 
+- Reduced-motion overrides for anything that starts at `opacity: 0` live in
+  the **last** block of `Landing.css`; at equal specificity the later rule
+  wins, and a chip left at 0 for a reduced-motion visitor is invisible copy.
 - Element resets inside `.k-landing` are wrapped in `:where()` on purpose.
   Plain `.k-landing h2 { margin: 0 }` outranks the section classes and
   silently flattens every heading margin on the page.
