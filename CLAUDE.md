@@ -95,3 +95,17 @@ terminal-only and unavailable in cloud sessions.
 
 /browse additionally needs a working Chromium and an environment network
 policy that allows the target host. Neither is guaranteed in a cloud session.
+
+### Team mode
+
+gstack runs in team mode: `.claude/hooks/check-gstack.sh` is a PreToolUse hook
+that blocks skills when gstack is missing. It is patched against upstream to
+enforce gstack only for gstack's own skills — project-scope and account-synced
+skills resolve without it, and blocking them would leave cloud sessions with no
+skills at all. Re-check that patch after /gstack-upgrade or a re-run of
+`gstack-team-init`, either of which may revert it.
+
+Each developer installs gstack once:
+
+    git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+    cd ~/.claude/skills/gstack && ./setup --team
