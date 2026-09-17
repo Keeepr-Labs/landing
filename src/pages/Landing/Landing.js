@@ -6,8 +6,10 @@ import {
   ProgressScreen,
   ChatScreen,
   CommitmentCard,
-  PledgeScreen,
   GoalScreen,
+  Leaderboard,
+  SyncVisual,
+  RoundsStrip,
   PACE_TIERS,
 } from './AppScreens';
 import './Landing.css';
@@ -100,9 +102,9 @@ function Hero() {
             Stick to it.
           </h1>
           <p className="k-hero__lede">
-            Keeep makes it easier to stick to your workout goals — whatever they are.
-            You commit to a number of workouts a month, put a pledge behind it, and
-            share the whole thing with your friends.
+            Keeep is a little side quest you keep with a friend. Pick a workout
+            goal, put a date on it, and let someone you like watch you actually
+            do it. Your workouts show up on their own. So does the leaderboard.
           </p>
           <div className="k-hero__actions">
             <AppStoreButton />
@@ -110,11 +112,12 @@ function Hero() {
           </div>
           <ul className="k-hero__proof">
             <li>
-              <span aria-hidden="true">🎟️</span> No subscription — you pay for the
-              tickets you use
+              <span aria-hidden="true">❤️</span> Workouts sync from Apple Health —
+              nothing to log
             </li>
             <li>
-              <span aria-hidden="true">⏱️</span> Set up a group in about a minute
+              <span aria-hidden="true">🗓️</span> A new round every month, a new goal
+              every round
             </li>
           </ul>
         </div>
@@ -122,7 +125,7 @@ function Hero() {
         <div className="k-hero__device">
           <PhoneFrame
             tone="purple"
-            label="The Keeep group header: a semicircle progress arc showing 8 of 12 workouts done, a green on-pace message, 9 days left, 2 tickets pledged, and the six people in the chat with their own progress."
+            label="The Keeep group header: a semicircle progress arc showing 8 of 12 workouts done, a green on-pace message, 9 days left, second place on the board of six, and the leaderboard with everyone's progress."
           >
             <ProgressScreen />
           </PhoneFrame>
@@ -201,14 +204,20 @@ function Secret() {
         <div className="k-secret__cards">
           <div className="k-icard">
             <span className="k-icard__emoji" aria-hidden="true">👀</span>
-            <h3 className="k-icard__title">Accountability to your goal</h3>
-            <p className="k-icard__text">A group chat with your friends.</p>
+            <h3 className="k-icard__title">Someone who'll notice</h3>
+            <p className="k-icard__text">
+              A group chat with a friend or two. Your workouts land in it. So do
+              the days you skip.
+            </p>
           </div>
           <span className="k-secret__plus" aria-hidden="true">+</span>
           <div className="k-icard">
-            <span className="k-icard__emoji" aria-hidden="true">🎟️</span>
-            <h3 className="k-icard__title">Having something at stake</h3>
-            <p className="k-icard__text">A pledge ticket. It costs real money.</p>
+            <span className="k-icard__emoji" aria-hidden="true">🗓️</span>
+            <h3 className="k-icard__title">A number and a date</h3>
+            <p className="k-icard__text">
+              Twelve workouts by the end of the month. Specific enough that
+              "I'll get to it" stops working.
+            </p>
           </div>
         </div>
       </div>
@@ -216,40 +225,40 @@ function Secret() {
   );
 }
 
-/** Ingredient one: the Arena. */
-function Accountability() {
+/** Ingredient one: the side quest. */
+function SideQuest() {
   return (
-    <Reveal className="k-feature k-feature--accountability" aria-labelledby="k-acc-title">
+    <Reveal className="k-feature k-feature--quest" aria-labelledby="k-quest-title">
       <div className="k-feature__inner">
         <div className="k-feature__copy">
           <p className="k-feature__eyebrow">Ingredient one</p>
-          <h2 className="k-feature__title" id="k-acc-title">
-            When everybody's progress — or lack thereof — is on display…
+          <h2 className="k-feature__title" id="k-quest-title">
+            Put it out there, and it stops being optional
           </h2>
-          <p className="k-feature__pull">There's nowhere to hide!</p>
+          <p className="k-feature__pull">A little side quest, with a friend.</p>
           <p className="k-feature__text">
-            Every workout you share lands in the chat, verified from Apple Health.
-            So does every day you don't. Your friends see the same arc you do —
-            which makes skipping a workout a lot harder than it used to be.
+            Keeep isn't the centre of your universe. It's a small game you keep
+            going with someone you like — a shared goal, a chat, a bit of healthy
+            competition. The magnificent side effect is that you actually work out.
           </p>
           <ul className="k-list">
             <li>
-              <span aria-hidden="true">💬</span> A group chat, built for
-              accountability — not another feed
+              <span aria-hidden="true">💬</span> A group chat built for one thing —
+              not another feed
             </li>
             <li>
-              <span aria-hidden="true">📊</span> Everyone's pace, side by side, all
-              month
+              <span aria-hidden="true">🔥</span> Every workout you do shows up for
+              everyone to react to
             </li>
             <li>
-              <span aria-hidden="true">🤝</span> Do it with people you actually know.
-              That's what makes it work
+              <span aria-hidden="true">😏</span> Better together. Also: slightly
+              competitive together
             </li>
           </ul>
         </div>
         <div className="k-feature__device">
           <PhoneFrame
-            label="A Keeep group chat called Sunday Runners. Dani has shared a 42-minute outdoor run, verified from Apple Health, and the group has reacted to it."
+            label="A Keeep group chat called Sunday Runners. Dani's 42-minute outdoor run has synced from Apple Health, the group has reacted with fire and clapping emoji, and Mara is teasing Dani about being one workout behind."
           >
             <ChatScreen />
           </PhoneFrame>
@@ -265,65 +274,82 @@ function Accountability() {
   );
 }
 
-/** Ingredient two: the stakes, stated without apology. */
-function Stakes() {
+/** Who to bring — it's all about who you share with. */
+function WhoToBring() {
+  const people = [
+    { emoji: '📱', who: 'The friend you keep meaning to text' },
+    { emoji: '✈️', who: 'The one who moved away' },
+    { emoji: '👯', who: 'Your running buddy' },
+    { emoji: '👨‍👩‍👧', who: 'Your sister. Your dad. Your cousin' },
+    { emoji: '☕', who: 'That crew from the cycling café' },
+    { emoji: '🏃‍♀️', who: 'Someone from the run club' },
+    { emoji: '💼', who: 'The colleague who also "should really"' },
+    { emoji: '💛', who: 'Your partner' },
+  ];
+
   return (
-    <Reveal className="k-feature k-feature--stakes" aria-labelledby="k-stakes-title">
-      <div className="k-feature__inner k-feature__inner--reverse">
-        <div className="k-feature__copy">
-          <p className="k-feature__eyebrow">Ingredient two</p>
-          <h2 className="k-feature__title" id="k-stakes-title">
-            Stick to your goal, keep your tickets. Don't, adiós 💸
-          </h2>
-          <p className="k-feature__text">
-            It sucks to lose your tickets. They cost you money! And that's the
-            entire point — you want to have something to lose. A pledge ticket does
-            nothing else. It's there to make skipping hurt a little, so your future
-            self gets moving on the bad days, the busy days, the rainy days.
-          </p>
-          <p className="k-feature__pull">
-            It's a cheat code for motivation <span aria-hidden="true">🏌️‍♀️</span>
-          </p>
-          <p className="k-feature__text k-feature__text--small">
-            Putting your money where your mouth is gets you moving. Even a few extra
-            workouts in a month and it's money well spent.
-          </p>
-        </div>
-        {/* One phone, with the commitment card floating in front of it —
-            overlapping two full phones hid the very screens this section
-            exists to show. */}
-        <div className="k-feature__device k-feature__device--stack">
-          <PhoneFrame label="The pledge screen: two pledge tickets worth $10 each, $20 pledged this round, above the line stick to your goal, keep your tickets. Don't, adiós.">
-            <PledgeScreen />
-          </PhoneFrame>
-          <div
-            className="k-commit-float"
-            role="img"
-            aria-label="A metallic commitment card reading: I, ALEX, commit to completing 12 total workouts by March 31."
-          >
-            <CommitmentCard />
-          </div>
-        </div>
+    <Reveal className="k-who" aria-labelledby="k-who-title">
+      <div className="k-who__inner">
+        <p className="k-who__eyebrow">It's all about who you share with</p>
+        <h2 className="k-who__title" id="k-who-title">
+          Bring someone. Anyone, really.
+        </h2>
+        <p className="k-who__text">
+          Accountability works far better with people you actually know. It doubles
+          as an excuse to stay in touch — a standing reason to check in every week
+          that isn't "how are things".
+        </p>
+        <ul className="k-who__grid">
+          {people.map((p, i) => (
+            <li className="k-who__chip" key={p.who} style={{ '--i': i }}>
+              <span className="k-who__emoji" aria-hidden="true">{p.emoji}</span>
+              {p.who}
+            </li>
+          ))}
+        </ul>
       </div>
     </Reveal>
   );
 }
 
-/** The Personal Coach layer: honest pace feedback. */
-function Coach() {
+/** Ingredient two: keeping yourself honest — leaderboard, pacer, badge. */
+function Honest() {
   const order = ['goodPace', 'gettingTight', 'noRoomForError', 'dead'];
   return (
-    <Reveal className="k-coach" aria-labelledby="k-coach-title">
-      <div className="k-coach__inner">
-        <p className="k-coach__eyebrow">And a coach who keeps it real</p>
-        <h2 className="k-coach__title" id="k-coach-title">
-          You always know exactly where you stand
-        </h2>
-        <p className="k-coach__text">
-          Keeep does the math on your remaining days and tells you the truth about
-          your pace. No trophies for effort, no doom either — just what it'll take
-          from here.
-        </p>
+    <Reveal className="k-honest" aria-labelledby="k-honest-title">
+      <div className="k-honest__inner">
+        <div className="k-honest__top">
+          <div className="k-honest__copy">
+            <p className="k-honest__eyebrow">Ingredient two</p>
+            <h2 className="k-honest__title" id="k-honest-title">
+              A specific number, by a specific date, with your name on it
+            </h2>
+            <p className="k-honest__text">
+              You commit to a goal for the round — say twelve workouts by the 31st —
+              and Keeep does the maths on the days you have left. The leaderboard
+              keeps everyone honest. The pacer keeps you on track. No trophies for
+              effort, no doom either: just what it'll take from here.
+            </p>
+          </div>
+
+          <div className="k-honest__objects">
+            <div className="k-board" role="img" aria-label="The leaderboard: Mara first with 11 of 12, you second with 8, Priya 7, Dani 5, Tom 2, Leo 0 — each with a pace-coloured dot.">
+              <p className="k-board__title" aria-hidden="true">Leaderboard · 9 days left</p>
+              <div aria-hidden="true">
+                <Leaderboard />
+              </div>
+            </div>
+            <div
+              className="k-badge-float"
+              role="img"
+              aria-label="Your commitment badge for the round: I, ALEX, commit to completing 12 total workouts by March 31."
+            >
+              <CommitmentCard />
+            </div>
+          </div>
+        </div>
+
+        <p className="k-honest__sub">The pacer, in its own words</p>
         <ul className="k-tiers">
           {order.map((key) => {
             const tier = PACE_TIERS[key];
@@ -344,26 +370,125 @@ function Coach() {
   );
 }
 
+/** Auto-synced workouts: you do the work, we bring the data. */
+function Sync() {
+  return (
+    <Reveal className="k-syncsec" aria-labelledby="k-sync-title">
+      <div className="k-syncsec__inner">
+        <div className="k-syncsec__copy">
+          <p className="k-syncsec__eyebrow">Nothing to log</p>
+          <h2 className="k-syncsec__title" id="k-sync-title">
+            You do the work at the gym. We do the work of bringing the data.
+          </h2>
+          <p className="k-syncsec__text">
+            Run, lift, swim, climb, walk the dog for an hour — whatever you're into,
+            it's already in Apple Health. Keeep picks it up from there and drops it
+            in the chat, with the numbers. No typing, no forgetting, no "I'll add it
+            later".
+          </p>
+        </div>
+        <SyncVisual />
+      </div>
+    </Reveal>
+  );
+}
+
+/**
+ * Backed by science. Citations are from memory and this environment could
+ * not reach PubMed to double-check them — verify the four before publishing.
+ */
+function Science() {
+  const studies = [
+    {
+      stat: '95% vs 76%',
+      claim: 'finished the programme when they joined with friends, versus alone.',
+      cite: 'Wing & Jeffery, Journal of Consulting and Clinical Psychology, 1999',
+    },
+    {
+      stat: '2.75×',
+      claim:
+        'more likely to keep the results ten months on when recruited with friends (66% vs 24%).',
+      cite: 'Wing & Jeffery, 1999',
+    },
+    {
+      stat: '76% vs 43%',
+      claim:
+        'of goals achieved by people who wrote them down and sent a friend weekly progress, versus people who just thought about them.',
+      cite: 'Matthews, Dominican University of California, 2015',
+    },
+    {
+      stat: '94 studies',
+      claim:
+        'agree: deciding exactly when, where and how you\'ll act has a medium-to-large effect on actually doing it.',
+      cite: 'Gollwitzer & Sheeran, Advances in Experimental Social Psychology, 2006',
+    },
+  ];
+
+  return (
+    <Reveal className="k-science" aria-labelledby="k-science-title">
+      <div className="k-science__inner">
+        <p className="k-science__eyebrow">Backed by science</p>
+        <h2 className="k-science__title" id="k-science-title">
+          Not a hunch. Accountability is one of the best-studied levers we have.
+        </h2>
+        <ul className="k-studies">
+          {studies.map((s) => (
+            <li className="k-study" key={s.stat + s.cite}>
+              <p className="k-study__stat">{s.stat}</p>
+              <p className="k-study__claim">{s.claim}</p>
+              <p className="k-study__cite">{s.cite}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="k-science__note">
+          Two ingredients, both with decades of evidence behind them: someone
+          watching, and a plan specific enough to be checked.
+        </p>
+      </div>
+    </Reveal>
+  );
+}
+
+/** Recurring rounds: life changes, the commitment doesn't. */
+function Rounds() {
+  return (
+    <Reveal className="k-roundsec" aria-labelledby="k-rounds-title">
+      <div className="k-roundsec__inner">
+        <p className="k-roundsec__eyebrow">Every month, a new round</p>
+        <h2 className="k-roundsec__title" id="k-rounds-title">
+          Sometimes you're on it. Sometimes you're slammed. Always committed.
+        </h2>
+        <p className="k-roundsec__text">
+          Rounds run monthly, and you set a fresh goal each time. A big one when
+          life's calm, a smaller one when it isn't. The point was never the number
+          — it's that there's always a next round, and you're always in it.
+        </p>
+        <RoundsStrip />
+      </div>
+    </Reveal>
+  );
+}
+
 /** Setup, in three steps. */
 function HowItWorks() {
   const steps = [
     {
       n: '1',
       emoji: '🎯',
-      title: 'Pick your pace',
-      text: 'Choose how many workouts you want next month. Keeep turns it into a monthly total you can actually hit.',
+      title: 'Pick a number and a date',
+      text: "Choose how many workouts you want this round. Keeep turns it into a pace you can actually keep, and a badge with your name on it.",
     },
     {
       n: '2',
-      emoji: '🎟️',
-      title: 'Put a pledge behind it',
-      text: "Buy pledge tickets and commit them to the round. Everyone in the group pledges — that's what keeps it fair.",
+      emoji: '💬',
+      title: 'Bring someone',
+      text: 'Start the chat and send the invite. One friend is plenty. A few is a party.',
     },
     {
       n: '3',
-      emoji: '💬',
-      title: 'Share it with your people',
-      text: 'Start the group chat and invite friends. Then just share your workouts as you do them.',
+      emoji: '❤️',
+      title: 'Go work out',
+      text: "That's it. Apple Health tells Keeep, Keeep tells the chat, the leaderboard updates. Next month, new round.",
     },
   ];
 
@@ -409,13 +534,13 @@ function HowItWorks() {
   );
 }
 
-/** Positioning, straight from the brand guidelines. */
+/** Positioning. */
 function Difference() {
   const rows = [
     { them: 'Fitness apps', line: 'Track your workouts and hope you stay motivated.' },
     { them: 'Habit trackers', line: 'A streak you can break with nobody noticing.' },
     { them: 'Workout apps', line: 'Great sessions to follow — if you show up.' },
-    { them: 'Points and badges', line: 'Rewards that cost nothing, so they mean nothing.' },
+    { them: 'Points and badges', line: 'Rewards from an app, that an app can see.' },
   ];
 
   return (
@@ -425,8 +550,8 @@ function Difference() {
           Keeep is not a fitness app. It's an accountability system.
         </h2>
         <p className="k-diff__text">
-          Willpower-based apps put the whole job on you. Keeep puts it partly on your
-          friends and partly on your wallet — so consistency becomes the path of
+          Willpower-based apps put the whole job on you. Keeep puts some of it on
+          a friend and some of it on a date — so consistency becomes the path of
           least resistance.
         </p>
         <ul className="k-diff__rows">
@@ -439,30 +564,10 @@ function Difference() {
           <li className="k-diff__row k-diff__row--us">
             <span className="k-diff__them">Keeep</span>
             <span className="k-diff__line">
-              Real friends, real money, real consequences.
+              A real friend, a real deadline, and a leaderboard you can't hide from.
             </span>
           </li>
         </ul>
-      </div>
-    </Reveal>
-  );
-}
-
-function Pricing() {
-  return (
-    <Reveal className="k-price" aria-labelledby="k-price-title">
-      <div className="k-price__inner">
-        <p className="k-price__eyebrow">No subscription</p>
-        <h2 className="k-price__title" id="k-price-title">
-          You pay for the tickets you use
-        </h2>
-        <p className="k-price__text">
-          That's the whole model. No monthly fee sitting on your card whether you
-          train or not. Buy a ticket, pledge it, keep it by showing up.
-        </p>
-        <p className="k-price__kicker">
-          Even getting just a few extra workouts in — it's money well spent.
-        </p>
       </div>
     </Reveal>
   );
@@ -472,19 +577,19 @@ function Faq() {
   const qs = [
     {
       q: 'What counts as a workout?',
-      a: "Whatever you decide counts. Keeep reads workouts from Apple Health so most things log themselves, and you can add one manually — it just gets flagged as manual input so the group can see the difference.",
+      a: "Whatever you decide counts. Keeep reads workouts from Apple Health, so runs, rides, lifts, swims, yoga, long walks — anything your watch or phone records — show up on their own. You can add one by hand too; it's just marked as manual so the group can tell.",
     },
     {
       q: 'What actually happens if I miss my goal?',
-      a: "You lose the tickets you pledged for that round. That's it — no penalty spiral, no lecture. Next round you set a goal that fits your real life better.",
-    },
-    {
-      q: 'Where does the money go?',
-      a: "Lost pledges are how Keeep makes money instead of charging you a subscription. We're upfront about it: the ticket exists so that losing it stings enough to get you out the door.",
+      a: "Nothing dramatic. The leaderboard shows it, your friends see it, and next month there's a new round with a goal that fits your real life better. The only thing on the line is the thing that was always on the line: whether you showed up.",
     },
     {
       q: 'Do I need friends on the app?',
-      a: "It works far better with people you actually know — that's the entire accountability engine. Start a group, share the invite link, and it takes a minute.",
+      a: "Yes — that's the entire mechanism. It works far better with people you actually know. Start a group, share the invite link, and it takes about a minute. One friend is plenty.",
+    },
+    {
+      q: 'How is it priced?',
+      a: 'Keeep is a simple subscription — no tiers, no add-ons. Current pricing is shown in the app.',
     },
     {
       q: 'Is it on Android?',
@@ -519,8 +624,8 @@ function FinalCta() {
           Let's get you started
         </h2>
         <p className="k-final__text">
-          Simple and very effective. Pick a pace, put something behind it, bring your
-          friends.
+          Simple and very effective. Pick a number, put a date on it, bring a
+          friend.
         </p>
         <div className="k-final__actions">
           <AppStoreButton variant="light" />
@@ -576,12 +681,14 @@ export default function Landing() {
         <Premise />
         <Problem />
         <Secret />
-        <Accountability />
-        <Stakes />
-        <Coach />
+        <SideQuest />
+        <WhoToBring />
+        <Honest />
+        <Sync />
+        <Science />
+        <Rounds />
         <HowItWorks />
         <Difference />
-        <Pricing />
         <Faq />
         <FinalCta />
       </main>

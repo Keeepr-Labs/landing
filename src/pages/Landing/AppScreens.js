@@ -18,6 +18,11 @@ import React from 'react';
 /**
  * The 5-tier pace scale from DESIGN.md. Pace is `workoutsLeft / daysLeft`:
  * the lower the ratio, the more comfortable you are.
+ *
+ * Copy is the coach voice — real, never patronising — and, since the model
+ * moved to a subscription, it talks about the round, never about money.
+ * The app's `getProgressMessage` strings should be brought in line with
+ * these when the pledge flow is removed there.
  */
 export const PACE_TIERS = {
   goalReached: {
@@ -44,13 +49,13 @@ export const PACE_TIERS = {
     label: 'No room for error',
     color: 'var(--orange-accent-dark)',
     bg: 'var(--orange-accent-bg)',
-    message: "🚨 No room for error: Miss a day and you'll lose your pledge",
+    message: '🚨 No room for error: One a day from here, or this round slips',
   },
   dead: {
     label: 'Out of days',
     color: 'var(--red-accent-dark)',
     bg: 'var(--red-accent-bg)',
-    message: '🔴 You ran out of days for this round. Ciao ciao pledged tickets 💸',
+    message: "🔴 Ran out of days this round. New month, new goal — let's go again",
   },
   noWorkouts: {
     label: 'Not started',
@@ -139,15 +144,52 @@ export function PhoneFrame({ label, tone = 'light', className = '', children }) 
   );
 }
 
+/* ------------------------------------------------------------ the leaderboard */
+
+/** The group, ranked by workouts done. `you` marks the viewer's row. */
+export const LEADERBOARD = [
+  { name: 'Mara', done: 11, goal: 12, tier: 'goalReached', emoji: '🧘' },
+  { name: 'You', done: 8, goal: 12, tier: 'goodPace', emoji: '🏃', you: true },
+  { name: 'Priya', done: 7, goal: 12, tier: 'goodPace', emoji: '🏊' },
+  { name: 'Dani', done: 5, goal: 12, tier: 'gettingTight', emoji: '🚴' },
+  { name: 'Tom', done: 2, goal: 12, tier: 'noRoomForError', emoji: '🏋️' },
+  { name: 'Leo', done: 0, goal: 12, tier: 'dead', emoji: '🛋️' },
+];
+
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+export function Leaderboard({ rows = LEADERBOARD, compact = false }) {
+  return (
+    <ul className={`k-people${compact ? ' k-people--compact' : ''}`}>
+      {rows.map((p, i) => (
+        <li className={`k-person${p.you ? ' k-person--you' : ''}`} key={p.name}>
+          <span className="k-person__rank" aria-hidden="true">
+            {MEDALS[i] || i + 1}
+          </span>
+          <span className="k-person__avatar" aria-hidden="true">{p.emoji}</span>
+          <span className="k-person__name">{p.name}</span>
+          <span
+            className="k-person__dot"
+            style={{ background: PACE_TIERS[p.tier].color }}
+          />
+          <span className="k-person__count">
+            {p.done}/{p.goal}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /* ---------------------------------------------------------------- screen: you */
 
-/** The group header — the app's signature screen. Arc + pace + stakes. */
+/** The group header — the app's signature screen. Arc + pace + leaderboard. */
 export function ProgressScreen({
   completed = 8,
   goal = 12,
   daysLeft = 9,
-  tickets = 2,
-  ticketValue = '$20',
+  rank = 2,
+  of = 6,
   tier = 'goodPace',
 }) {
   const pace = PACE_TIERS[tier];
@@ -185,40 +227,19 @@ export function ProgressScreen({
             </span>
           </div>
           <div className="k-counter">
-            <span className="k-counter__icon" aria-hidden="true">🎟️</span>
-            <span className="k-counter__num">{tickets}</span>
+            <span className="k-counter__icon" aria-hidden="true">🏆</span>
+            <span className="k-counter__num">#{rank}</span>
             <span className="k-counter__text">
-              <span className="k-counter__main">tickets pledged</span>
-              <span className="k-counter__sub">{ticketValue}</span>
+              <span className="k-counter__main">on the board</span>
+              <span className="k-counter__sub">of {of}</span>
             </span>
           </div>
         </div>
       </div>
 
       <div className="k-screen__card k-screen__card--bottom">
-        <p className="k-screen__eyebrow k-screen__eyebrow--dark">in this chat</p>
-        <ul className="k-people">
-          {[
-            { name: 'You', done: 8, goal: 12, tier: 'goodPace', emoji: '🏃' },
-            { name: 'Mara', done: 11, goal: 12, tier: 'goalReached', emoji: '🧘' },
-            { name: 'Dani', done: 5, goal: 12, tier: 'gettingTight', emoji: '🚴' },
-            { name: 'Tom', done: 2, goal: 12, tier: 'noRoomForError', emoji: '🏋️' },
-            { name: 'Priya', done: 7, goal: 12, tier: 'goodPace', emoji: '🏊' },
-            { name: 'Leo', done: 0, goal: 12, tier: 'dead', emoji: '🛋️' },
-          ].map((p) => (
-            <li className="k-person" key={p.name}>
-              <span className="k-person__avatar" aria-hidden="true">{p.emoji}</span>
-              <span className="k-person__name">{p.name}</span>
-              <span
-                className="k-person__dot"
-                style={{ background: PACE_TIERS[p.tier].color }}
-              />
-              <span className="k-person__count">
-                {p.done}/{p.goal}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <p className="k-screen__eyebrow k-screen__eyebrow--dark">leaderboard</p>
+        <Leaderboard compact />
       </div>
     </div>
   );
@@ -226,7 +247,7 @@ export function ProgressScreen({
 
 /* --------------------------------------------------------------- screen: chat */
 
-/** Group chat with a shared workout — the Arena in motion. */
+/** Group chat with a shared workout — the side quest in motion. */
 export function ChatScreen() {
   return (
     <div className="k-screen k-screen--chat">
@@ -241,37 +262,44 @@ export function ChatScreen() {
           <p className="k-msg__text">ok who's running before work tomorrow 👀</p>
         </div>
 
-        {/* NewWorkoutMessage: image + dark overlay, overline, metrics grid */}
+        {/* NewWorkoutMessage: image + dark overlay, overline, metrics grid.
+            Synced straight from Apple Health — nobody typed this in. */}
         <div className="k-workout">
           <div className="k-workout__overlay">
             <p className="k-workout__overline">New workout</p>
             <p className="k-workout__who">Dani</p>
           </div>
           <div className="k-workout__metrics">
-            <span className="k-workout__badge">✓ Device data</span>
+            <span className="k-workout__badge">✓ Apple Health</span>
             <div className="k-workout__grid">
               <div>
-                <p className="k-workout__label">Source</p>
-                <p className="k-workout__value">Apple Health</p>
+                <p className="k-workout__label">Type</p>
+                <p className="k-workout__value">Outdoor run</p>
               </div>
               <div>
                 <p className="k-workout__label">Duration</p>
                 <p className="k-workout__value">42 min</p>
               </div>
               <div>
-                <p className="k-workout__label">Type</p>
-                <p className="k-workout__value">Outdoor run</p>
-              </div>
-              <div>
                 <p className="k-workout__label">Distance</p>
                 <p className="k-workout__value">6.4 km</p>
+              </div>
+              <div>
+                <p className="k-workout__label">This round</p>
+                <p className="k-workout__value">6 / 12</p>
               </div>
             </div>
           </div>
           <div className="k-workout__reactions">
             <span>🔥 3</span>
             <span>👏 2</span>
+            <span>😮‍💨 1</span>
           </div>
+        </div>
+
+        <div className="k-msg k-msg--in">
+          <span className="k-msg__who">Mara</span>
+          <p className="k-msg__text">that puts you one behind me dani 😏</p>
         </div>
 
         <div className="k-msg k-msg--out">
@@ -285,13 +313,14 @@ export function ChatScreen() {
 /* --------------------------------------------------------- screen: commitment */
 
 /**
- * The metallic commitment card from `PersonalGoalRecap`. DESIGN.md reserves
- * this treatment for the rare high-impact moment, so it is the one loud
- * object on the page.
+ * The commitment badge from `PersonalGoalRecap`: a specific number, by a
+ * specific date, with your name on it. DESIGN.md reserves the metallic
+ * treatment for the rare high-impact moment, so it is the one loud object
+ * on the page.
  */
-export function CommitmentCard({ name = 'ALEX', total = 12, date = 'March 31' }) {
+export function CommitmentCard({ name = 'ALEX', total = 12, date = 'March 31', size = 'md' }) {
   return (
-    <div className="k-commit">
+    <div className={`k-commit k-commit--${size}`}>
       <div className="k-commit__sheen" aria-hidden="true" />
       <p className="k-commit__overline">I, {name}, commit to completing:</p>
       <p className="k-commit__number">{total}</p>
@@ -316,56 +345,9 @@ export function CommitmentScreen(props) {
   );
 }
 
-/* ------------------------------------------------------------ screen: pledge */
-
-/**
- * Pledge tickets — the stakes, stated plainly. `ticketValue` is the worth of
- * one ticket; the round total is the sum, so the two numbers agree with the
- * "2 tickets pledged / $20" counter on the group header screen.
- */
-export function PledgeScreen({ tickets = 2, ticketValue = 10, currency = '$' }) {
-  return (
-    <div className="k-screen k-screen--pledge">
-      <p className="k-pledge__overline">Everyone has to pledge</p>
-
-      <div className="k-tickets">
-        {Array.from({ length: tickets }).map((_, i) => (
-          <div className="k-ticket" key={i} style={{ '--n': i }}>
-            <div className="k-ticket__stub">
-              <span className="k-ticket__emoji" aria-hidden="true">🎟️</span>
-            </div>
-            <div className="k-ticket__body">
-              <p className="k-ticket__label">Pledge ticket</p>
-              <p className="k-ticket__worth">
-                Worth {currency}
-                {ticketValue}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="k-pledge__total">
-        <span className="k-pledge__total-label">Pledged this round</span>
-        <span className="k-pledge__total-value">
-          {currency}
-          {tickets * ticketValue}
-        </span>
-      </div>
-
-      <div className="k-pledge__stakes">
-        <p className="k-pledge__line">
-          Stick to your goal, <strong>keep your tickets.</strong>
-        </p>
-        <p className="k-pledge__line k-pledge__line--muted">Don't, adiós 💸</p>
-      </div>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------- screen: goal setting */
 
-/** Pace picker from `PersonalGoalShowcase` — the 2-minute setup. */
+/** Pace picker from `PersonalGoalShowcase` — the minute-long setup. */
 export function GoalScreen({ perWeek = 3, total = 12 }) {
   return (
     <div className="k-screen k-screen--goal">
@@ -401,5 +383,117 @@ export function GoalScreen({ perWeek = 3, total = 12 }) {
 
       <div className="k-goal__button">Continue</div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------ visual: syncing */
+
+/** Every kind of workout, pouring through Apple Health into the chat. */
+export const WORKOUT_KINDS = [
+  { emoji: '🏃', name: 'Run' },
+  { emoji: '🚴', name: 'Ride' },
+  { emoji: '🏊', name: 'Swim' },
+  { emoji: '🏋️', name: 'Lift' },
+  { emoji: '🧘', name: 'Yoga' },
+  { emoji: '🥾', name: 'Hike' },
+  { emoji: '🥊', name: 'Box' },
+  { emoji: '🚣', name: 'Row' },
+  { emoji: '⛷️', name: 'Ski' },
+  { emoji: '🏸', name: 'Play' },
+  { emoji: '🧗', name: 'Climb' },
+  { emoji: '🚶', name: 'Walk' },
+];
+
+export function SyncVisual() {
+  return (
+    <div
+      className="k-sync"
+      role="img"
+      aria-label="Twelve kinds of workout — running, cycling, swimming, lifting, yoga, hiking, boxing, rowing, skiing, racket sports, climbing and walking — flow through Apple Health and land in the Keeep chat as a shared workout."
+    >
+      <div className="k-sync__sources" aria-hidden="true">
+        {WORKOUT_KINDS.map((k, i) => (
+          <span className="k-sync__chip" key={k.name} style={{ '--i': i }}>
+            <span className="k-sync__emoji">{k.emoji}</span>
+            {k.name}
+          </span>
+        ))}
+      </div>
+
+      <div className="k-sync__flow" aria-hidden="true">
+        <span className="k-sync__arrow" />
+        <div className="k-sync__hub">
+          <span className="k-sync__heart">❤️</span>
+          <span className="k-sync__hublabel">Apple Health</span>
+        </div>
+        <span className="k-sync__arrow" />
+      </div>
+
+      <div className="k-sync__dest" aria-hidden="true">
+        <div className="k-workout k-workout--mini">
+          <div className="k-workout__overlay">
+            <p className="k-workout__overline">New workout</p>
+            <p className="k-workout__who">You</p>
+          </div>
+          <div className="k-workout__metrics">
+            <span className="k-workout__badge">✓ Apple Health</span>
+            <div className="k-workout__grid">
+              <div>
+                <p className="k-workout__label">Type</p>
+                <p className="k-workout__value">Strength</p>
+              </div>
+              <div>
+                <p className="k-workout__label">Duration</p>
+                <p className="k-workout__value">51 min</p>
+              </div>
+            </div>
+          </div>
+          <div className="k-workout__reactions">
+            <span>💪 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------- visual: rounds */
+
+/** A new goal every round. Life changes; the commitment doesn't. */
+export const ROUNDS = [
+  { month: 'January', total: 12, done: 12, state: 'done' },
+  { month: 'February', total: 8, done: 8, state: 'done', note: 'busy month, smaller goal' },
+  { month: 'March', total: 10, done: 7, state: 'live', note: '3 to go, 9 days left' },
+  { month: 'April', total: null, done: 0, state: 'next' },
+];
+
+export function RoundsStrip() {
+  return (
+    <ol
+      className="k-rounds"
+      aria-label="Four monthly rounds: January, 12 workouts, done. February, 8 workouts, done — a busy month, so a smaller goal. March, 7 of 10 so far, on pace. April, next round, set your goal."
+    >
+      {ROUNDS.map((r) => (
+        <li className={`k-round k-round--${r.state}`} key={r.month} aria-hidden="true">
+          <p className="k-round__month">{r.month}</p>
+          {r.state === 'next' ? (
+            <p className="k-round__number k-round__number--next">?</p>
+          ) : (
+            <p className="k-round__number">
+              {r.state === 'live' ? `${r.done}/${r.total}` : r.total}
+            </p>
+          )}
+          <p className="k-round__unit">
+            {r.state === 'next' ? 'set your goal' : 'workouts'}
+          </p>
+          <p className="k-round__state">
+            {r.state === 'done' && '✅ Done'}
+            {r.state === 'live' && '🟢 On pace'}
+            {r.state === 'next' && '🗓️ Next round'}
+          </p>
+          {r.note ? <p className="k-round__note">{r.note}</p> : null}
+        </li>
+      ))}
+    </ol>
   );
 }

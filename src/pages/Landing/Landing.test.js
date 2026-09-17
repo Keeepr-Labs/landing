@@ -1,7 +1,7 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Landing from './Landing';
-import { SemiCircleArc } from './AppScreens';
+import { SemiCircleArc, PACE_TIERS, LEADERBOARD, ROUNDS } from './AppScreens';
 import useReveal from './useReveal';
 
 const renderLanding = () =>
@@ -20,6 +20,24 @@ describe('Landing page', () => {
     // regress to that as the primary action on the home route.
     expect(screen.queryByPlaceholderText(/enter your email/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /waitlist/i })).not.toBeInTheDocument();
+  });
+
+  test('carries no trace of the retired pledge-ticket model', () => {
+    const { container } = renderLanding();
+
+    // The business moved from pledge tickets to a subscription. Nothing on
+    // the page — visible copy, aria-labels, or screen internals — may still
+    // sell stakes, tickets or money on the line.
+    const everything = (container.textContent + ' ' +
+      Array.from(container.querySelectorAll('[aria-label]'))
+        .map((el) => el.getAttribute('aria-label'))
+        .join(' ')).toLowerCase();
+
+    expect(everything).not.toMatch(/pledge/);
+    expect(everything).not.toMatch(/ticket/);
+    expect(everything).not.toMatch(/adiós/);
+    expect(everything).not.toMatch(/money where your mouth/);
+    expect(everything).not.toMatch(/💸/);
   });
 
   test('primary CTA links to the live App Store listing', () => {
@@ -44,47 +62,83 @@ describe('Landing page', () => {
     expect(androidLinks[0]).toHaveAttribute('href', '/waitlistAndroid');
   });
 
-  test('tells the whole accountability + stakes story', () => {
+  test('tells the accountability story end to end', () => {
     renderLanding();
 
-    expect(screen.getByText(/two, not so secret, ingredients/i)).toBeInTheDocument();
-    expect(screen.getByText(/nowhere to hide/i)).toBeInTheDocument();
-    // "keep your tickets" appears in both the stakes headline and the phone
-    // screen beside it, so assert on the headline specifically.
-    expect(
-      screen.getByRole('heading', { name: /keep your tickets/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: /you pay for the tickets you use/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: /not a fitness app/i })
-    ).toBeInTheDocument();
+    // Section titles only — step titles (h3) reuse some of the same words.
+    const heading = (re) => screen.getByRole('heading', { level: 2, name: re });
+    expect(heading(/two, not so secret, ingredients/i)).toBeInTheDocument();
+    expect(heading(/put it out there/i)).toBeInTheDocument();
+    expect(heading(/bring someone/i)).toBeInTheDocument();
+    expect(heading(/specific number, by a specific date/i)).toBeInTheDocument();
+    expect(heading(/we do the work of bringing the data/i)).toBeInTheDocument();
+    expect(heading(/best-studied levers/i)).toBeInTheDocument();
+    expect(heading(/always committed/i)).toBeInTheDocument();
+    expect(heading(/not a fitness app/i)).toBeInTheDocument();
   });
 
-  test('describes each app screen for screen readers', () => {
+  test('cites its science with a source on every study', () => {
     renderLanding();
 
-    // Screens are decorative markup, so each phone carries the story in its
-    // accessible name rather than leaving assistive tech with empty divs.
+    const list = screen.getByRole('heading', { name: /best-studied levers/i }).parentElement;
+    const cites = within(list).getAllByText(/\b(19|20)\d{2}\b/);
+    // Four study cards, each ending in a year — no orphan statistics.
+    expect(cites).toHaveLength(4);
+  });
+
+  test('describes each app screen and visual for screen readers', () => {
+    renderLanding();
+
     const phones = screen
       .getAllByRole('img')
       .filter((el) => el.classList.contains('k-phone'));
 
-    expect(phones).toHaveLength(4); // hero, chat, pledge, goal
+    expect(phones).toHaveLength(3); // hero, chat, goal
     phones.forEach((el) => {
       expect(el).toHaveAccessibleName();
     });
 
-    // The commitment card floats outside a phone frame but still narrates.
-    expect(
-      screen.getByRole('img', { name: /commit to completing 12 total workouts/i })
-    ).toBeInTheDocument();
+    // Standalone visuals narrate themselves too.
+    expect(screen.getByRole('img', { name: /commit to completing 12 total workouts/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /leaderboard: mara first/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /flow through apple health/i })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: /four monthly rounds/i })).toBeInTheDocument();
 
     // Purely decorative art stays out of the accessibility tree entirely.
     const deco = document.querySelector('.k-feature__deco');
     expect(deco).toHaveAttribute('aria-hidden', 'true');
     expect(deco).toHaveAttribute('alt', '');
+  });
+
+  test('mentions the subscription only as a fact, never a price we do not know', () => {
+    renderLanding();
+
+    expect(screen.getByText(/simple subscription/i)).toBeInTheDocument();
+    expect(screen.queryByText(/\$\d/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/free trial/i)).not.toBeInTheDocument();
+  });
+});
+
+describe('pace copy', () => {
+  test('never talks about money', () => {
+    Object.values(PACE_TIERS).forEach((tier) => {
+      expect(tier.message.toLowerCase()).not.toMatch(/pledge|ticket|money|\$|💸/);
+    });
+  });
+});
+
+describe('demo data', () => {
+  test('leaderboard is sorted by workouts done, with the viewer marked', () => {
+    const done = LEADERBOARD.map((p) => p.done);
+    expect(done).toEqual([...done].sort((a, b) => b - a));
+    expect(LEADERBOARD.filter((p) => p.you)).toHaveLength(1);
+  });
+
+  test('rounds show completed goals as completed and the live round in progress', () => {
+    ROUNDS.filter((r) => r.state === 'done').forEach((r) => expect(r.done).toBe(r.total));
+    const live = ROUNDS.find((r) => r.state === 'live');
+    expect(live.done).toBeLessThan(live.total);
+    expect(ROUNDS.find((r) => r.state === 'next').total).toBeNull();
   });
 });
 

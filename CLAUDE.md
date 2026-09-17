@@ -12,11 +12,23 @@ app is live, so the primary CTA is the App Store listing
 (`apps.apple.com/app/id6471142186`); Android still routes to
 `/waitlistAndroid`.
 
+The business model is a **subscription**. Pledge tickets / stakes are
+retired — the page must not mention pledges, tickets or money on the line
+(`Landing.test.js` enforces this). Value props, in page order: accountability
+as a side quest with a friend → who to bring → leaderboard + pacer + the
+commitment badge (a number, a date, your name) → workouts auto-sync from
+Apple Health → backed by science → recurring monthly rounds → setup.
+
 - `Landing.js` — section composition and all marketing copy
-- `AppScreens.js` — the in-app screens rebuilt in HTML/CSS (pace arc, group
-  chat, pledge tickets, commitment card, goal setup) so they stay crisp and
-  responsive instead of shipping screenshots. Swap a component body for an
-  `<img>` if you ever get Figma exports.
+- `AppScreens.js` — the in-app screens rebuilt in HTML/CSS (pace arc,
+  leaderboard, group chat, commitment badge, goal setup) plus the auto-sync
+  and rounds visuals, so they stay crisp and responsive instead of shipping
+  screenshots. Swap a component body for an `<img>` if you ever get Figma
+  exports. `PACE_TIERS` copy here is the source of truth for the pacer
+  messages on the site; the app's `getProgressMessage` still has pledge
+  wording and should be aligned.
+- The four studies in `Science()` are cited from memory (this environment
+  could not reach PubMed) — verify before a big push.
 - `useReveal.js` — one-shot scroll reveal; falls back to "already revealed"
   when IntersectionObserver is missing so content never depends on an effect
 - Copy voice and the narrative order come from the Keeep-mobile repo:
