@@ -5,6 +5,11 @@ inbox at `/admin/support` (Stream Chat; backend is the separate Keeep-backend
 repo on Heroku, reached via the `/api/admin/support/*` proxy in
 `public/_redirects` for prod and `src/setupProxy.js` for dev).
 
+Invite link previews: the `/invite` edge function
+(`netlify/edge-functions/invite.ts`) personalizes the page's OG tags and points
+og:image at the `/og/invite` function (`netlify/functions/og-invite/`), which
+draws the invite card PNG. Shared logic lives in `netlify/lib/invite-preview.mts`.
+
 ## Deploy Configuration
 
 - Platform: netlify (project "getkeeep")
@@ -20,6 +25,15 @@ repo on Heroku, reached via the `/api/admin/support/*` proxy in
   any tooling upgrade
 - When fixing a bug, add a regression test; when adding a conditional, test
   both paths
+- Netlify functions: `npm run test:netlify` (Node's built-in runner, Node
+  22.18+ for TypeScript). After touching `netlify/functions/og-invite/` or
+  upgrading satori/resvg, also run `npm run check:og-bundle`: it builds the
+  deployable zip and renders a card from it, which catches runtime files
+  missing from `included_files` in `netlify.toml`
+- Local run: `INVITE_PREVIEW_API_URL=<mock or local backend>/api/public/invite-preview
+  npx netlify-cli dev --functions netlify/functions --framework "#static" --dir build`
+  (after `npm run build`). The CLI's static mode doesn't run edge functions;
+  drive `invite.ts` directly with Deno for the /invite half
 
 ## Skill routing
 

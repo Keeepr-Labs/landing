@@ -4,7 +4,7 @@
 # path prefix the admin app uses; a blanket /api/* would put the whole
 # backend same-origin with the marketing pages and their cookie. The 200!
 # forces the rewrite even if a static file ever shadows the path.
-# Backend host also appears in src/setupProxy.js and netlify/edge-functions/invite.ts.
+# Backend host also appears in src/setupProxy.js and netlify/lib/invite-preview.mts.
 /api/admin/support/*  https://keeep-9dde9ef1f49f.herokuapp.com/api/admin/support/:splat  200!
 
 /invite        /inviteLink.html    200

@@ -1,5 +1,27 @@
 # TODOS
 
+## Invite link preview card (`/og/invite`)
+
+### Draw emoji on the card
+**Priority:** P3
+Emoji are stripped from the card (Manrope has no glyphs; the text title keeps them), so "Book Club 📚" renders as "Book Club" and an emoji-only group name gets the static card. Satori's `loadAdditionalAsset` can supply emoji as SVG images (Twemoji is CC-BY 4.0 and needs attribution; Noto Emoji is Apache 2.0).
+**Noticed:** invite card build (2026-09-25).
+
+### Card for non-Latin names
+**Priority:** P3
+Names Manrope can't draw (CJK, Arabic, Hebrew, Thai…) get the static card rather than missing glyphs. If invites in those scripts matter, bundle a fallback font (e.g. Noto Sans subsets) and pass it to Satori.
+**Noticed:** invite card build (2026-09-25).
+
+### Rate-limit the image function
+**Priority:** P3
+Each uncached `/og/invite` URL costs one backend lookup plus a render, and random `c=` values are always uncached, the same exposure `/invite` already has. If abuse shows up, add `rateLimit` to the function's `config` (Netlify code-based rate limiting) with a rewrite to `/images/shareLink.png`.
+**Noticed:** invite card build (2026-09-25).
+
+### Remove the dead `/invite → /inviteLink.html` rule
+**Priority:** P3
+`public/invite.html` exists, so Netlify serves it at `/invite` and the non-forced `_redirects` rule never fires (the edge function rewrites invite.html's tags). Delete the rule, and `inviteLink.html` if nothing links to `/invitelink`, so nobody edits the wrong page.
+**Noticed:** invite card build (2026-09-25).
+
 ## Admin support inbox (backend — Keeep-backend repo)
 
 ### Tighten admin session cookie to SameSite=Lax
