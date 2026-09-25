@@ -57,6 +57,14 @@ describe("text sizing", () => {
     );
   });
 
+  it("keeps the group name to two lines when a badge sits below it", () => {
+    assert.equal(groupNameStyle("A".repeat(60), true).maxLines, 2);
+    assert.ok(
+      groupNameStyle("Saturday Long Run Crew", true).fontSize <
+        groupNameStyle("Saturday Long Run Crew").fontSize,
+    );
+  });
+
   it("shrinks the inviter line for long first names", () => {
     assert.ok(
       inviterLineSize(`${"M".repeat(24)} invited you to join`) <
@@ -106,6 +114,19 @@ describe("GET /og/invite", () => {
       assert.equal(res.headers.get("cache-control"), "public, max-age=300");
       assert.ok(!Buffer.from(await res.arrayBuffer()).equals(staticCard));
     }
+  });
+
+  it("draws the join-by badge while the window is open", async () => {
+    const inThreeDays = new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10);
+    const withDate = { ...preview, nextPayDate: inThreeDays };
+    backend(withDate);
+    const badged = await request(`c=${CONVO}&v=${previewVersion(withDate)}`);
+    assert.equal(badged.headers.get("cache-control"), "public, max-age=31536000, immutable");
+    backend(preview);
+    const plain = await request(`c=${CONVO}&v=${previewVersion(preview)}`);
+    assert.ok(
+      !Buffer.from(await badged.arrayBuffer()).equals(Buffer.from(await plain.arrayBuffer())),
+    );
   });
 
   it("renders the group-only card when the inviter is unknown", async () => {

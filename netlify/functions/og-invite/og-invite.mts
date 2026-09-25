@@ -6,7 +6,8 @@
  * The /invite edge function points og:image here. This looks the names up
  * again from the backend (never from the URL: the `g` link param and any
  * name param are attacker-controlled) and draws "{First} invited you to
- * join {Group}" on the brand card.
+ * join {Group}" on the brand card, with a "Join by {date}" badge while the
+ * join window is open and the backend sends it.
  *
  * A Node function rather than an edge function because Satori + resvg can
  * exceed the edge CPU budget (~50 ms).
@@ -20,6 +21,7 @@
 import {
   fetchInvitePreview,
   isConvoId,
+  joinByLabel,
   normalizeInviterId,
   previewVersion,
 } from "../../lib/invite-preview.mts";
@@ -83,16 +85,18 @@ export default async (req: Request): Promise<Response> => {
     if (!data) return fallback(req, "lookup failed");
     if (!data.valid || !data.groupName) return fallback(req, "no group");
 
+    const now = new Date(); // one clock for the badge and the version
     const png = await renderInviteCard({
       groupName: data.groupName,
       inviterFirstName: data.inviterFirstName ?? null,
+      badge: joinByLabel(data.nextPayDate, now),
     });
     if (!png) return fallback(req, "names not renderable");
 
-    // A matching v means this URL always shows these names: cache for a
-    // year. A stale or missing v (renamed since the page was built) still
-    // gets the current names, briefly.
-    return url.searchParams.get("v") === previewVersion(data)
+    // A matching v means this URL always shows this card: cache for a
+    // year. A stale or missing v (renamed, or the window closed, since the
+    // page was built) still gets the current card, briefly.
+    return url.searchParams.get("v") === previewVersion(data, now)
       ? imageResponse(png, ONE_YEAR, true)
       : imageResponse(png, STALE_VERSION_MAX_AGE);
   } catch (error) {

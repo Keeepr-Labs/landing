@@ -5,8 +5,10 @@
  *
  * The preview endpoint lives in Keeep-backend (api/public/public-router.js)
  * and always answers HTTP 200 with either
- *   { valid: true, groupName, inviterFirstName }   (inviterFirstName may be null)
+ *   { valid: true, groupName, inviterFirstName, nextPayDate? }
  *   { valid: false }
+ * inviterFirstName may be null; nextPayDate ('YYYY-MM-DD', the last day to
+ * join) arrives with the v2 backend and is optional here.
  */
 
 export const INVITE_PREVIEW_API_URL =
@@ -18,7 +20,7 @@ export const OG_IMAGE_PATH = "/og/invite";
 // Bump when the card design changes: it is part of the `v=` hash, so every
 // invite gets a new image URL and iMessage refetches instead of reusing
 // its per-URL cache of the old design.
-export const OG_IMAGE_DESIGN_VERSION = "1";
+export const OG_IMAGE_DESIGN_VERSION = "2";
 
 // Output clamps. The backend also clamps server-side, so these are
 // belt-and-suspenders for unexpected input.
@@ -35,6 +37,7 @@ export interface InvitePreview {
   valid: boolean;
   groupName?: string;
   inviterFirstName?: string | null;
+  nextPayDate?: string | null;
 }
 
 export const isConvoId = (c: string | null): c is string =>
@@ -52,30 +55,36 @@ export const inviteApiUrl = (): string => {
     Netlify?: { env?: { get(key: string): string | undefined } };
     process?: { env?: Record<string, string | undefined> };
   };
-  const override =
-    g.Netlify?.env?.get("INVITE_PREVIEW_API_URL") ??
-    g.process?.env?.INVITE_PREVIEW_API_URL;
+  let override: string | undefined;
+  try {
+    // Netlify's global on the platform and under `netlify dev`; plain
+    // process.env under `node --test`.
+    override = g.Netlify
+      ? g.Netlify.env?.get("INVITE_PREVIEW_API_URL")
+      : g.process?.env?.INVITE_PREVIEW_API_URL;
+  } catch {
+    // Deno throws on env reads without permission: use production.
+  }
   return override && /^https?:\/\//.test(override)
     ? override
     : INVITE_PREVIEW_API_URL;
 };
 
 /**
- * Fetch preview data from the backend with a hard timeout. Returns null
- * on any failure — callers treat null as "no personalization".
+ * Fetch preview data from the backend with a hard timeout. Never throws:
+ * returns null on any failure — callers treat null as "no personalization".
  */
 export const fetchInvitePreview = async (
   c: string,
   i: string | null,
   timeoutMs: number,
 ): Promise<InvitePreview | null> => {
-  const url = new URL(inviteApiUrl());
-  url.searchParams.set("c", c);
-  if (i) url.searchParams.set("i", i);
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
+    const url = new URL(inviteApiUrl());
+    url.searchParams.set("c", c);
+    if (i) url.searchParams.set("i", i);
     const res = await fetch(url.toString(), { signal: controller.signal });
     if (!res.ok) return null;
     const body = (await res.json()) as InvitePreview;
@@ -135,10 +144,16 @@ export const buildDescription = (_data: InvitePreview): string | null =>
   );
 
 // Alt text says what the generated card shows.
-export const buildImageAlt = (data: InvitePreview): string =>
-  data.inviterFirstName
+export const buildImageAlt = (
+  data: InvitePreview,
+  now: Date = new Date(),
+): string => {
+  const invite = data.inviterFirstName
     ? `${data.inviterFirstName} invited you to join ${data.groupName} on Keeep`
     : `You're invited to join ${data.groupName} on Keeep`;
+  const badge = joinByLabel(data.nextPayDate, now);
+  return badge ? `${invite}. ${badge}.` : invite;
+};
 
 /**
  * 64-bit FNV-1a over the UTF-8 bytes, base36. Not a security hash: `v=`
@@ -153,13 +168,59 @@ const fnv1a64 = (input: string): string => {
   return hash.toString(36);
 };
 
-/** Cache-busting version of the card: design version + the rendered names. */
-export const previewVersion = (data: InvitePreview): string =>
+// 'YYYY-MM-DD', optionally followed by an ISO time.
+const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/;
+const joinByFormat = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+/**
+ * "Join by Fri, Oct 3" while the join window is open, else null.
+ *
+ * A date, never a countdown: iMessage bakes the preview into the bubble at
+ * send time, so "2 days left" would go stale in the chat. nextPayDate is
+ * the last day to join, as the app's countdown shows it (end of that day)
+ * and as the invite inbox expires it (nextPayDate < today).
+ */
+export const joinByLabel = (
+  nextPayDate: string | null | undefined,
+  now: Date = new Date(),
+): string | null => {
+  const m = typeof nextPayDate === "string" ? DATE_RE.exec(nextPayDate) : null;
+  if (!m) return null;
+  const [year, month, day] = [Number(m[1]), Number(m[2]) - 1, Number(m[3])];
+  const deadline = Date.UTC(year, month, day);
+  // Date.UTC rolls 2026-13-45 over into 2027; only a real date may show.
+  const check = new Date(deadline);
+  if (
+    check.getUTCFullYear() !== year ||
+    check.getUTCMonth() !== month ||
+    check.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  if (deadline < today) return null;
+  return `Join by ${joinByFormat.format(deadline)}`;
+};
+
+/**
+ * Cache-busting version of the card: design version + everything drawn on
+ * it (names and the join-by badge, which disappears once the window closes).
+ */
+export const previewVersion = (
+  data: InvitePreview,
+  now: Date = new Date(),
+): string =>
   fnv1a64(
     [
       OG_IMAGE_DESIGN_VERSION,
       data.groupName ?? "",
       data.inviterFirstName ?? "",
+      joinByLabel(data.nextPayDate, now) ?? "",
     ].join("\u0000"),
   );
 
@@ -183,12 +244,13 @@ export const buildOgImageUrl = (
   c: string,
   i: string | null,
   data: InvitePreview,
+  now: Date = new Date(),
 ): string => {
   const url = new URL(OG_IMAGE_PATH, origin);
   url.searchParams.set("c", c.toLowerCase());
   const inviterId = normalizeInviterId(i);
   if (inviterId) url.searchParams.set("i", inviterId);
-  url.searchParams.set("v", previewVersion(data));
+  url.searchParams.set("v", previewVersion(data, now));
   return url.toString();
 };
 

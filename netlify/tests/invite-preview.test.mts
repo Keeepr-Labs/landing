@@ -8,6 +8,8 @@ import {
   fetchInvitePreview,
   imageOrigin,
   INVITE_PREVIEW_API_URL,
+  inviteApiUrl,
+  joinByLabel,
   previewVersion,
   rewriteInviteMeta,
 } from "../lib/invite-preview.mts";
@@ -78,11 +80,49 @@ describe("previewVersion", () => {
     assert.equal(versions.size, 3);
   });
 
+  it("changes when the join-by badge appears or the window closes", () => {
+    const withDate = { ...base, nextPayDate: "2026-10-03" };
+    const open = new Date("2026-10-01T12:00:00Z");
+    const closed = new Date("2026-10-04T12:00:00Z");
+    assert.notEqual(previewVersion(base, open), previewVersion(withDate, open));
+    assert.notEqual(previewVersion(withDate, open), previewVersion(withDate, closed));
+    assert.equal(previewVersion(base, closed), previewVersion(withDate, closed));
+  });
+
   it("does not collide when text moves between the two names", () => {
     assert.notEqual(
       previewVersion({ valid: true, groupName: "ab", inviterFirstName: "c" }),
       previewVersion({ valid: true, groupName: "a", inviterFirstName: "bc" }),
     );
+  });
+});
+
+describe("joinByLabel", () => {
+  const now = new Date("2026-09-25T12:00:00Z");
+
+  it("names the last day to join as a date, never a countdown", () => {
+    assert.equal(joinByLabel("2026-10-03", now), "Join by Sat, Oct 3");
+  });
+
+  it("still shows on the deadline day itself", () => {
+    assert.equal(joinByLabel("2026-09-25", now), "Join by Fri, Sep 25");
+  });
+
+  it("disappears once the window has closed", () => {
+    assert.equal(joinByLabel("2026-09-24", now), null);
+  });
+
+  it("accepts a full ISO timestamp", () => {
+    assert.equal(joinByLabel("2026-10-03T00:00:00.000Z", now), "Join by Sat, Oct 3");
+  });
+
+  it("ignores missing or malformed dates", () => {
+    for (const value of [
+      undefined, null, "", "soon", "10/03/2026",
+      "2026-13-45", "2026-02-30", "2026-10-03garbage",
+    ]) {
+      assert.equal(joinByLabel(value, now), null, String(value));
+    }
   });
 });
 
@@ -175,6 +215,16 @@ describe("rewriteInviteMeta on public/invite.html", () => {
     );
   });
 
+  it("adds the join-by date to the alt text when there is one", () => {
+    assert.equal(
+      buildImageAlt(
+        { ...data, nextPayDate: "2026-10-03" },
+        new Date("2026-09-25T12:00:00Z"),
+      ),
+      "Maria invited you to join Run Club on Keeep. Join by Sat, Oct 3.",
+    );
+  });
+
   it("leaves the card size and type alone", () => {
     assert.equal(metaContent(html, "og:image:width"), "1200");
     assert.equal(metaContent(html, "og:image:height"), "630");
@@ -237,6 +287,34 @@ describe("fetchInvitePreview", () => {
     ]) {
       globalThis.fetch = (async () => response) as typeof fetch;
       assert.equal(await fetchInvitePreview(CONVO, null, 1000), null);
+    }
+  });
+
+  it("uses INVITE_PREVIEW_API_URL for local testing", () => {
+    process.env.INVITE_PREVIEW_API_URL = "http://localhost:8787/api/public/invite-preview";
+    try {
+      assert.equal(inviteApiUrl(), "http://localhost:8787/api/public/invite-preview");
+    } finally {
+      delete process.env.INVITE_PREVIEW_API_URL;
+    }
+    assert.equal(inviteApiUrl(), INVITE_PREVIEW_API_URL);
+  });
+
+  it("uses production and never throws when env access is denied", async () => {
+    const g = globalThis as { Netlify?: unknown };
+    g.Netlify = {
+      env: {
+        get() {
+          throw new Error('NotCapable: Requires env access to "INVITE_PREVIEW_API_URL"');
+        },
+      },
+    };
+    try {
+      assert.equal(inviteApiUrl(), INVITE_PREVIEW_API_URL);
+      globalThis.fetch = (async () => Response.json({ valid: false })) as typeof fetch;
+      assert.deepEqual(await fetchInvitePreview(CONVO, null, 1000), { valid: false });
+    } finally {
+      delete g.Netlify;
     }
   });
 

@@ -4,7 +4,7 @@
 [functions."og-invite"]
   # Files the invite card function reads from disk at runtime. Netlify's
   # bundler can't see these reads, so they must be listed:
-  # - fonts, wordmark and fallback card: ASSETS in
+  # - fonts, wordmark, twirl and fallback card: ASSETS in
   #   netlify/functions/og-invite/render-card.mts
   # - resvg's wasm: loaded by render-card.mts
   # - harfbuzz's wasm: satori's text shaper reads it next to its own module.
@@ -14,6 +14,7 @@
     "public/fonts/static/Manrope-SemiBold.ttf",
     "public/fonts/static/Manrope-ExtraBold.ttf",
     "public/images/LogoWhite.svg",
+    "public/images/twirlWhite.svg",
     "public/images/shareLink.png",
     "node_modules/@resvg/resvg-wasm/index_bg.wasm",
     "node_modules/harfbuzzjs/hb.wasm",
