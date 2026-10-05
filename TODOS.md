@@ -1,5 +1,42 @@
 # TODOS
 
+## Invite link preview card (`/og/invite`)
+
+### Show the join-by badge before v2 ships
+**Priority:** P2
+The card's "Join by {date}" badge reads `nextPayDate` from `GET /api/public/invite-preview`. Production (Keeep-backend `main`) doesn't return it yet; the v2 lane does (`feature/commitment-model`, 98dd1be). Until v2 is live the card shows no badge. For it sooner, add just `nextPayDate` to main's invite-preview response.
+**Noticed:** invite card redesign (2026-09-25).
+
+### Join endpoint may close a day before the app says (Keeep-backend)
+**Priority:** P2 (verify first)
+`POST` join in `api/usersConvos/usersConvos-router.js` rejects when `now.isAfter(dayjs(nextPayDate))`, which is midnight at the start of nextPayDate in the server's timezone (UTC on Heroku unless TZ is set). The app's `CountdownTimer` counts to the end of nextPayDate (local), and the invites inbox expires only after it (`nextPayDate < CURRENT_DATE`), and so does the card's "Join by" date. If confirmed, invitees see time left on the deadline day but their join fails. Compare against `dayjs(nextPayDate).endOf('day')` in the user's timezone.
+**Noticed:** invite card redesign (2026-09-25).
+
+### Card size vs. WhatsApp
+**Priority:** P3
+Cards are ~410 KB PNGs (the twirl's chalk texture doesn't compress). iMessage is fine; WhatsApp reportedly skips og:images over ~300 KB. If WhatsApp invites matter, encode JPEG from resvg's pixels (e.g. jpeg-js, ~120 KB) and send `og:image:type` to match.
+**Noticed:** invite card redesign (2026-09-25).
+
+### Draw emoji on the card
+**Priority:** P3
+Emoji are stripped from the card (Manrope has no glyphs; the text title keeps them), so "Book Club 📚" renders as "Book Club" and an emoji-only group name gets the static card. Satori's `loadAdditionalAsset` can supply emoji as SVG images (Twemoji is CC-BY 4.0 and needs attribution; Noto Emoji is Apache 2.0).
+**Noticed:** invite card build (2026-09-25).
+
+### Card for non-Latin names
+**Priority:** P3
+Names Manrope can't draw (CJK, Arabic, Hebrew, Thai…) get the static card rather than missing glyphs. If invites in those scripts matter, bundle a fallback font (e.g. Noto Sans subsets) and pass it to Satori.
+**Noticed:** invite card build (2026-09-25).
+
+### Rate-limit the image function
+**Priority:** P3
+Each uncached `/og/invite` URL costs one backend lookup plus a render, and random `c=` values are always uncached, the same exposure `/invite` already has. If abuse shows up, add `rateLimit` to the function's `config` (Netlify code-based rate limiting) with a rewrite to `/images/shareLink.png`.
+**Noticed:** invite card build (2026-09-25).
+
+### Remove the dead `/invite → /inviteLink.html` rule
+**Priority:** P3
+`public/invite.html` exists, so Netlify serves it at `/invite` and the non-forced `_redirects` rule never fires (the edge function rewrites invite.html's tags). Delete the rule, and `inviteLink.html` if nothing links to `/invitelink`, so nobody edits the wrong page.
+**Noticed:** invite card build (2026-09-25).
+
 ## Admin support inbox (backend — Keeep-backend repo)
 
 ### Tighten admin session cookie to SameSite=Lax
