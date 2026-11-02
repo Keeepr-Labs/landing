@@ -7,6 +7,11 @@ repo on Heroku, reached via the `/api/admin/support/*` proxy in
 
 ## Landing page (`/`)
 
+**Read `docs/landing-structure.md` first.** It is the reviewed eight-section
+structure the page is being rebuilt to, with four open decisions that must
+be answered before building; the current code is still the superseded
+15-section layout.
+
 `src/pages/Landing/` — a value/feature page, not a waitlist capture. The iOS
 app is live, so the primary CTA is the App Store listing
 (`apps.apple.com/app/id6471142186`); Android still routes to
