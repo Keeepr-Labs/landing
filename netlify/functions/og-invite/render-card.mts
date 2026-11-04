@@ -10,6 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import { loadFallbackFonts } from "./fallback-fonts.mts";
 
 export const CARD_WIDTH = 1200;
 export const CARD_HEIGHT = 630;
@@ -132,6 +133,27 @@ export const cardText = (s: string | null | undefined): string =>
   (s ?? "").replace(EMOJI_RE, "").replace(/\s+/g, " ").trim();
 
 const charCount = (s: string): number => [...s].length;
+
+// Satori orders right-to-left words but draws each word's letters left to
+// right. Hebrew has no joining forms, so a name written only in Hebrew is
+// drawn right by reversing the letters of each word.
+// Arabic (and other right-to-left scripts) would need its letters shaped
+// before reversing, and a name mixing directions needs a full bidi pass,
+// so those still get the static card.
+const RTL = /[\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Nko}\p{Script=Adlam}]/u;
+const HEBREW_ONLY = /^[\p{Script=Hebrew}\s'"׳״.\-]+$/u;
+
+/** The string to draw left to right, or null when it can't be drawn. */
+export const visualOrder = (s: string): string | null => {
+  if (!RTL.test(s)) return s;
+  if (!HEBREW_ONLY.test(s)) return null;
+  // Satori already places the words right to left; only the letters inside
+  // each word come out in typed order.
+  return s
+    .split(" ")
+    .map((word) => [...word].reverse().join(""))
+    .join("\u00A0"); // a plain space between Hebrew words collapses to nothing
+};
 
 // Size tiers for the group name, by total length and by its longest word
 // (a word can't wrap, so it must fit one 1040px line on its own). The
@@ -305,33 +327,41 @@ export const buildCard = (
 };
 
 /**
- * PNG bytes of the card, or null when the names can't be drawn with
- * Manrope (e.g. CJK or Arabic script) — the caller then serves the static
- * card instead of an image with missing glyphs.
+ * PNG bytes of the card, or null when the names can't be drawn — the
+ * caller then serves the static card instead of an image with missing
+ * glyphs. Characters Manrope lacks (Japanese, Arabic, Hebrew…) are drawn
+ * in the script's Noto Sans (fallback-fonts.mts); null only when that
+ * font can't be loaded.
  */
 export const renderInviteCard = async (content: {
   groupName: string;
   inviterFirstName: string | null;
   badge: string | null;
 }): Promise<Uint8Array | null> => {
-  const groupName = cardText(content.groupName);
-  if (!groupName) return null;
+  const groupName = visualOrder(cardText(content.groupName));
+  const inviter = visualOrder(cardText(content.inviterFirstName));
+  if (!groupName || inviter === null) return null;
 
   // Satori asks for extra fonts only when a character is missing from
-  // Manrope; treat that as "can't render".
+  // Manrope: answer with the script's Noto Sans, and treat a font we
+  // can't load as "can't render".
   let missingGlyphs = false;
   const svg = await satori(
     buildCard(
-      { inviter: cardText(content.inviterFirstName), groupName, badge: content.badge },
+      { inviter, groupName, badge: content.badge },
       { background: await loadBackground(), wordmark: loadWordmark() },
     ) as never,
     {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       fonts: loadFonts(),
-      loadAdditionalAsset: async () => {
-        missingGlyphs = true;
-        return [];
+      loadAdditionalAsset: async (languageCode: string, segment: string) => {
+        const extra = await loadFallbackFonts(languageCode, segment);
+        if (!extra) {
+          missingGlyphs = true;
+          return [];
+        }
+        return extra as never;
       },
     },
   );
