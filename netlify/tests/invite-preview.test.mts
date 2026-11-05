@@ -27,28 +27,39 @@ const metaContent = (html: string, key: string): string | undefined =>
   )?.[1];
 
 describe("buildTitle", () => {
-  it("names the inviter and the group", () => {
+  it("names the inviter, the group and what the group is for", () => {
     assert.equal(
-      buildTitle({ valid: true, groupName: "Run Club", inviterFirstName: "Maria" }),
-      "Maria invited you to join -Run Club-",
+      buildTitle({ valid: true, groupName: "No Flake Zone", inviterFirstName: "Sam" }),
+      "Sam invited you to join No Flake Zone, a workout accountability group 💪",
     );
   });
 
   it("falls back to a passive title without an inviter", () => {
     assert.equal(
       buildTitle({ valid: true, groupName: "Run Club", inviterFirstName: null }),
-      "You're invited to join -Run Club-",
+      "You're invited to join Run Club, a workout accountability group 💪",
     );
   });
 
-  it("clamps to 60 characters", () => {
+  it("shortens a long group name and keeps the whole suffix", () => {
     const title = buildTitle({
       valid: true,
-      groupName: "A".repeat(59) + "…",
+      groupName: "A".repeat(80),
       inviterFirstName: "Maria",
     });
-    assert.equal(title?.length, 60);
-    assert.ok(title?.endsWith("…"));
+    assert.ok(title!.length <= 90);
+    assert.ok(title!.endsWith("A…, a workout accountability group 💪"));
+  });
+
+  it("never cuts the emoji in half when the first name is huge", () => {
+    const title = buildTitle({
+      valid: true,
+      groupName: "Run Club",
+      inviterFirstName: "M".repeat(70),
+    })!;
+    assert.equal([...title].length, 90);
+    assert.ok(title.endsWith("…"));
+    assert.doesNotMatch(title, /[\uD800-\uDBFF](?![\uDC00-\uDFFF])/);
   });
 
   it("returns null without a group name", () => {
@@ -207,8 +218,14 @@ describe("rewriteInviteMeta on public/invite.html", () => {
   });
 
   it("rewrites the titles and the image alt text", () => {
-    assert.equal(metaContent(html, "og:title"), "Maria invited you to join -Run Club-");
-    assert.equal(metaContent(html, "twitter:title"), "Maria invited you to join -Run Club-");
+    assert.equal(
+      metaContent(html, "og:title"),
+      "Maria invited you to join Run Club, a workout accountability group 💪",
+    );
+    assert.equal(
+      metaContent(html, "twitter:title"),
+      "Maria invited you to join Run Club, a workout accountability group 💪",
+    );
     assert.equal(
       metaContent(html, "og:image:alt"),
       "Maria invited you to join Run Club on Keeep",
@@ -254,7 +271,7 @@ describe("rewriteInviteMeta on public/invite.html", () => {
     });
     assert.equal(
       metaContent(out, "og:title"),
-      "O&#39;Brien invited you to join -Gym $$ &amp; &quot;Co&quot; $1 &lt;b&gt;-",
+      "O&#39;Brien invited you to join Gym $$ &amp; &quot;Co&quot; $1 &lt;b&gt;, a workout accountability group 💪",
     );
   });
 });
