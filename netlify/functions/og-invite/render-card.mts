@@ -10,6 +10,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import { loadFallbackFonts } from "./fallback-fonts.mts";
+import { drawRtlText, isRtl, type SvgDrawer, type TextImage } from "./rtl.mts";
 
 export const CARD_WIDTH = 1200;
 export const CARD_HEIGHT = 630;
@@ -86,6 +88,27 @@ const ensureResvg = () =>
     throw error;
   }));
 
+// Right-to-left names are drawn by resvg (rtl.mts): it renders the text
+// with the fonts given and reports where the ink landed.
+const drawSvgText: SvgDrawer = (svg, fonts, defaultFamily) => {
+  const resvg = new Resvg(svg, {
+    font: { fontBuffers: fonts, defaultFontFamily: defaultFamily, loadSystemFonts: false },
+  });
+  try {
+    const box = resvg.getBBox();
+    const ink = box ? { x: box.x, width: box.width } : null;
+    box?.free();
+    const image = resvg.render();
+    try {
+      return { png: image.asPng(), ink };
+    } finally {
+      image.free();
+    }
+  } finally {
+    resvg.free();
+  }
+};
+
 const svgToPng = (svg: string): Uint8Array => {
   const resvg = new Resvg(svg);
   try {
@@ -132,6 +155,8 @@ export const cardText = (s: string | null | undefined): string =>
   (s ?? "").replace(EMOJI_RE, "").replace(/\s+/g, " ").trim();
 
 const charCount = (s: string): number => [...s].length;
+
+
 
 // Size tiers for the group name, by total length and by its longest word
 // (a word can't wrap, so it must fit one 1040px line on its own). The
@@ -190,10 +215,16 @@ export interface CardContent {
   inviter: string; // "" when unknown
   groupName: string;
   badge: string | null;
+  // Right-to-left names, already drawn (rtl.mts), in place of the text.
+  inviterImage?: TextImage;
+  groupImage?: TextImage;
 }
 
+const textImage = (image: TextImage, style: Record<string, unknown> = {}): CardNode =>
+  el("img", { src: image.src, width: image.width, height: image.height, style });
+
 export const buildCard = (
-  { inviter, groupName, badge }: CardContent,
+  { inviter, groupName, badge, inviterImage, groupImage }: CardContent,
   art: { background: string; wordmark: string },
 ): CardNode => {
   const lead = inviter ? "invited you to join" : "You’re invited to join";
@@ -239,6 +270,7 @@ export const buildCard = (
             {
               style: {
                 display: "flex",
+                alignItems: "center",
                 fontSize: inviterLineSize(`${inviter} ${lead}`),
                 letterSpacing: "-0.015em",
                 whiteSpace: "nowrap",
@@ -246,12 +278,16 @@ export const buildCard = (
             },
             inviter
               ? [
-                  el("div", { style: { fontWeight: 800, marginRight: "0.28em" } }, inviter),
+                  inviterImage
+                    ? textImage(inviterImage, { marginRight: "0.22em" })
+                    : el("div", { style: { fontWeight: 800, marginRight: "0.28em" } }, inviter),
                   el("div", { style: { fontWeight: 600, color: WHITE_SECONDARY } }, lead),
                 ]
               : [el("div", { style: { fontWeight: 600, color: WHITE_SECONDARY } }, lead)],
           ),
-          el(
+          groupImage
+            ? textImage(groupImage, { marginTop: 4 })
+            : el(
             "div",
             {
               style: {
@@ -305,9 +341,12 @@ export const buildCard = (
 };
 
 /**
- * PNG bytes of the card, or null when the names can't be drawn with
- * Manrope (e.g. CJK or Arabic script) — the caller then serves the static
- * card instead of an image with missing glyphs.
+ * PNG bytes of the card, or null when the names can't be drawn — the
+ * caller then serves the static card instead of an image with missing
+ * glyphs. Characters Manrope lacks (Japanese, Korean, Thai…) are drawn
+ * in the script's Noto Sans (fallback-fonts.mts). Right-to-left names
+ * (Arabic, Hebrew…) are drawn by resvg in Noto Sans too (rtl.mts). Null
+ * only when such a font can't be loaded, or nothing drawable is left.
  */
 export const renderInviteCard = async (content: {
   groupName: string;
@@ -315,23 +354,50 @@ export const renderInviteCard = async (content: {
   badge: string | null;
 }): Promise<Uint8Array | null> => {
   const groupName = cardText(content.groupName);
+  const inviter = cardText(content.inviterFirstName);
   if (!groupName) return null;
 
+  // Right-to-left names are drawn by resvg, not Satori (see rtl.mts).
+  const lead = inviter ? "invited you to join" : "";
+  let inviterImage: TextImage | undefined;
+  let groupImage: TextImage | undefined;
+  if (isRtl(groupName) || isRtl(inviter)) {
+    await ensureResvg();
+    const manrope = new Uint8Array(readAsset(ASSETS.fontExtraBold));
+    const draw = (text: string, fontSize: number, maxWidth: number) =>
+      drawRtlText(text, { fontSize, weight: 800, color: "#FFFFFF", maxWidth, manrope, draw: drawSvgText });
+    if (isRtl(groupName)) {
+      const image = await draw(groupName, groupNameStyle(groupName, Boolean(content.badge)).fontSize, CARD_WIDTH - 160);
+      if (!image) return null;
+      groupImage = image;
+    }
+    if (isRtl(inviter)) {
+      const image = await draw(inviter, inviterLineSize(`${inviter} ${lead}`), 520);
+      if (!image) return null;
+      inviterImage = image;
+    }
+  }
+
   // Satori asks for extra fonts only when a character is missing from
-  // Manrope; treat that as "can't render".
+  // Manrope: answer with the script's Noto Sans, and treat a font we
+  // can't load as "can't render".
   let missingGlyphs = false;
   const svg = await satori(
     buildCard(
-      { inviter: cardText(content.inviterFirstName), groupName, badge: content.badge },
+      { inviter, groupName, badge: content.badge, inviterImage, groupImage },
       { background: await loadBackground(), wordmark: loadWordmark() },
     ) as never,
     {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       fonts: loadFonts(),
-      loadAdditionalAsset: async () => {
-        missingGlyphs = true;
-        return [];
+      loadAdditionalAsset: async (languageCode: string, segment: string) => {
+        const extra = await loadFallbackFonts(languageCode, segment);
+        if (!extra) {
+          missingGlyphs = true;
+          return [];
+        }
+        return extra as never;
       },
     },
   );

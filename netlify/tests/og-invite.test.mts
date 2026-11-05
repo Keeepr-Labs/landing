@@ -7,6 +7,8 @@ import {
   groupNameStyle,
   inviterLineSize,
 } from "../functions/og-invite/render-card.mts";
+import { baseDirection, isRtl } from "../functions/og-invite/rtl.mts";
+import { fallbackFamily } from "../functions/og-invite/fallback-fonts.mts";
 import { previewVersion } from "../lib/invite-preview.mts";
 
 const CONVO = "9f1c2b7e-4d3a-4c5b-8e6f-0a1b2c3d4e5f";
@@ -70,6 +72,26 @@ describe("text sizing", () => {
       inviterLineSize(`${"M".repeat(24)} invited you to join`) <
         inviterLineSize("Maria invited you to join"),
     );
+  });
+});
+
+describe("fallback fonts", () => {
+  it("picks the script's Noto Sans, the first known code winning", () => {
+    assert.equal(fallbackFamily("ja-JP"), "Noto Sans JP");
+    assert.equal(fallbackFamily("ja-JP|zh-CN|zh-TW|zh-HK"), "Noto Sans JP");
+    assert.equal(fallbackFamily("he-IL"), "Noto Sans Hebrew");
+    assert.equal(fallbackFamily("something-new"), "Noto Sans");
+    assert.equal(fallbackFamily("emoji"), null);
+  });
+
+  it("sends right-to-left names to resvg, in the direction of their first letter", () => {
+    assert.equal(isRtl("Run Club"), false);
+    assert.equal(isRtl("東京ランナーズ"), false);
+    assert.equal(isRtl("רצים בבוקר"), true);
+    assert.equal(isRtl("نادي الجري"), true);
+    assert.equal(baseDirection("نادي الجري"), "rtl");
+    assert.equal(baseDirection("Run Club רצים"), "ltr");
+    assert.equal(baseDirection("רצים Run Club"), "rtl");
   });
 });
 
@@ -164,11 +186,69 @@ describe("GET /og/invite", () => {
     await expectStaticCard(await request(`c=${CONVO}`));
   });
 
-  it("serves the static card for names Manrope can't draw", async () => {
-    backend({ valid: true, groupName: "東京ランナーズ", inviterFirstName: "Ken" });
+  // The backend, plus Google Fonts answering with a subset of Noto Sans JP
+  // (fixtures, cut for "東京ランナーズ"), or failing.
+  const fontFixture = (script: "jp" | "arabic", weight: 600 | 800) =>
+    readFileSync(new URL(`./fixtures/noto-sans-${script}-${weight}-subset.ttf`, import.meta.url));
+  let fontCalls = 0;
+  const backendWithFonts = (body: unknown, fontsUp: boolean) => {
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === "fonts.googleapis.com") {
+        fontCalls++;
+        if (!fontsUp) return new Response("", { status: 503 });
+        const weight = url.searchParams.get("family")!.endsWith("800") ? 800 : 600;
+        return new Response(
+          `@font-face { src: url(https://fonts.gstatic.com/${url.searchParams.get("family")!.includes("Arabic") ? "arabic" : "jp"}-${weight}.ttf) format('truetype'); }`,
+        );
+      }
+      if (url.hostname === "fonts.gstatic.com") {
+        const script = url.pathname.includes("arabic") ? "arabic" : "jp";
+        return new Response(fontFixture(script, url.pathname.includes("800") ? 800 : 600));
+      }
+      apiCalls++;
+      return Response.json(body);
+    }) as typeof fetch;
+  };
+  afterEach(() => {
+    fontCalls = 0;
+  });
+
+  it("draws names Manrope can't in the script's Noto Sans", async () => {
+    backendWithFonts({ valid: true, groupName: "東京ランナーズ", inviterFirstName: "Ken" }, true);
+    const res = await request(`c=${CONVO}`);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("cache-control"), "public, max-age=300");
+    const png = new Uint8Array(await res.arrayBuffer());
+    assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
+    assert.ok(!Buffer.from(png).equals(staticCard));
+    assert.ok(fontCalls > 0);
+  });
+
+  it("serves the static card when the fallback font can't be loaded", async () => {
+    // Satori keeps fonts it loaded for the life of the instance, so this
+    // uses characters the test above didn't.
+    backendWithFonts({ valid: true, groupName: "大阪", inviterFirstName: "Ken" }, false);
     await expectStaticCard(await request(`c=${CONVO}`));
-    backend({ valid: true, groupName: "🔥🔥🔥", inviterFirstName: "Ken" });
+  });
+
+  it("draws Arabic names (group and inviter) instead of the static card", async () => {
+    backendWithFonts({ valid: true, groupName: "نادي الجري", inviterFirstName: "نادي" }, true);
+    const res = await request(`c=${CONVO}`);
+    const png = new Uint8Array(await res.arrayBuffer());
+    assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
+    assert.ok(!Buffer.from(png).equals(staticCard));
+  });
+
+  it("serves the static card for Arabic names when the font can't be loaded", async () => {
+    backendWithFonts({ valid: true, groupName: "نادي الجري", inviterFirstName: "Ken" }, false);
     await expectStaticCard(await request(`c=${CONVO}`));
+  });
+
+  it("serves the static card for emoji-only names, without fetching fonts", async () => {
+    backendWithFonts({ valid: true, groupName: "🔥🔥🔥", inviterFirstName: "Ken" }, true);
+    await expectStaticCard(await request(`c=${CONVO}`));
+    assert.equal(fontCalls, 0);
   });
 
   it("ignores a name passed in the URL", async () => {
