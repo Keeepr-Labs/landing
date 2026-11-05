@@ -6,8 +6,8 @@ import {
   cardText,
   groupNameStyle,
   inviterLineSize,
-  visualOrder,
 } from "../functions/og-invite/render-card.mts";
+import { baseDirection, isRtl } from "../functions/og-invite/rtl.mts";
 import { fallbackFamily } from "../functions/og-invite/fallback-fonts.mts";
 import { previewVersion } from "../lib/invite-preview.mts";
 
@@ -84,12 +84,14 @@ describe("fallback fonts", () => {
     assert.equal(fallbackFamily("emoji"), null);
   });
 
-  it("draws Hebrew by reversing each word, and refuses scripts it can't order", () => {
-    assert.equal(visualOrder("Run Club"), "Run Club");
-    assert.equal(visualOrder("東京ランナーズ"), "東京ランナーズ");
-    assert.equal(visualOrder("רצים בבוקר"), "םיצר\u00A0רקובב");
-    assert.equal(visualOrder("نادي الجري"), null);
-    assert.equal(visualOrder("Run רצים"), null);
+  it("sends right-to-left names to resvg, in the direction of their first letter", () => {
+    assert.equal(isRtl("Run Club"), false);
+    assert.equal(isRtl("東京ランナーズ"), false);
+    assert.equal(isRtl("רצים בבוקר"), true);
+    assert.equal(isRtl("نادي الجري"), true);
+    assert.equal(baseDirection("نادي الجري"), "rtl");
+    assert.equal(baseDirection("Run Club רצים"), "ltr");
+    assert.equal(baseDirection("רצים Run Club"), "rtl");
   });
 });
 
@@ -186,8 +188,8 @@ describe("GET /og/invite", () => {
 
   // The backend, plus Google Fonts answering with a subset of Noto Sans JP
   // (fixtures, cut for "東京ランナーズ"), or failing.
-  const fontFixture = (weight: 600 | 800) =>
-    readFileSync(new URL(`./fixtures/noto-sans-jp-${weight}-subset.ttf`, import.meta.url));
+  const fontFixture = (script: "jp" | "arabic", weight: 600 | 800) =>
+    readFileSync(new URL(`./fixtures/noto-sans-${script}-${weight}-subset.ttf`, import.meta.url));
   let fontCalls = 0;
   const backendWithFonts = (body: unknown, fontsUp: boolean) => {
     globalThis.fetch = (async (input: string | URL | Request) => {
@@ -197,11 +199,12 @@ describe("GET /og/invite", () => {
         if (!fontsUp) return new Response("", { status: 503 });
         const weight = url.searchParams.get("family")!.endsWith("800") ? 800 : 600;
         return new Response(
-          `@font-face { src: url(https://fonts.gstatic.com/test-${weight}.ttf) format('truetype'); }`,
+          `@font-face { src: url(https://fonts.gstatic.com/${url.searchParams.get("family")!.includes("Arabic") ? "arabic" : "jp"}-${weight}.ttf) format('truetype'); }`,
         );
       }
       if (url.hostname === "fonts.gstatic.com") {
-        return new Response(fontFixture(url.pathname.includes("800") ? 800 : 600));
+        const script = url.pathname.includes("arabic") ? "arabic" : "jp";
+        return new Response(fontFixture(script, url.pathname.includes("800") ? 800 : 600));
       }
       apiCalls++;
       return Response.json(body);
@@ -229,9 +232,20 @@ describe("GET /og/invite", () => {
     await expectStaticCard(await request(`c=${CONVO}`));
   });
 
-  it("serves the static card for Arabic and emoji-only names, without fetching fonts", async () => {
-    backendWithFonts({ valid: true, groupName: "نادي الجري", inviterFirstName: "Ken" }, true);
+  it("draws Arabic names (group and inviter) instead of the static card", async () => {
+    backendWithFonts({ valid: true, groupName: "نادي الجري", inviterFirstName: "نادي" }, true);
+    const res = await request(`c=${CONVO}`);
+    const png = new Uint8Array(await res.arrayBuffer());
+    assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
+    assert.ok(!Buffer.from(png).equals(staticCard));
+  });
+
+  it("serves the static card for Arabic names when the font can't be loaded", async () => {
+    backendWithFonts({ valid: true, groupName: "نادي الجري", inviterFirstName: "Ken" }, false);
     await expectStaticCard(await request(`c=${CONVO}`));
+  });
+
+  it("serves the static card for emoji-only names, without fetching fonts", async () => {
     backendWithFonts({ valid: true, groupName: "🔥🔥🔥", inviterFirstName: "Ken" }, true);
     await expectStaticCard(await request(`c=${CONVO}`));
     assert.equal(fontCalls, 0);

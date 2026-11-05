@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import { loadFallbackFonts } from "./fallback-fonts.mts";
+import { drawRtlText, isRtl, type SvgDrawer, type TextImage } from "./rtl.mts";
 
 export const CARD_WIDTH = 1200;
 export const CARD_HEIGHT = 630;
@@ -87,6 +88,27 @@ const ensureResvg = () =>
     throw error;
   }));
 
+// Right-to-left names are drawn by resvg (rtl.mts): it renders the text
+// with the fonts given and reports where the ink landed.
+const drawSvgText: SvgDrawer = (svg, fonts, defaultFamily) => {
+  const resvg = new Resvg(svg, {
+    font: { fontBuffers: fonts, defaultFontFamily: defaultFamily, loadSystemFonts: false },
+  });
+  try {
+    const box = resvg.getBBox();
+    const ink = box ? { x: box.x, width: box.width } : null;
+    box?.free();
+    const image = resvg.render();
+    try {
+      return { png: image.asPng(), ink };
+    } finally {
+      image.free();
+    }
+  } finally {
+    resvg.free();
+  }
+};
+
 const svgToPng = (svg: string): Uint8Array => {
   const resvg = new Resvg(svg);
   try {
@@ -134,26 +156,7 @@ export const cardText = (s: string | null | undefined): string =>
 
 const charCount = (s: string): number => [...s].length;
 
-// Satori orders right-to-left words but draws each word's letters left to
-// right. Hebrew has no joining forms, so a name written only in Hebrew is
-// drawn right by reversing the letters of each word.
-// Arabic (and other right-to-left scripts) would need its letters shaped
-// before reversing, and a name mixing directions needs a full bidi pass,
-// so those still get the static card.
-const RTL = /[\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Nko}\p{Script=Adlam}]/u;
-const HEBREW_ONLY = /^[\p{Script=Hebrew}\s'"׳״.\-]+$/u;
 
-/** The string to draw left to right, or null when it can't be drawn. */
-export const visualOrder = (s: string): string | null => {
-  if (!RTL.test(s)) return s;
-  if (!HEBREW_ONLY.test(s)) return null;
-  // Satori already places the words right to left; only the letters inside
-  // each word come out in typed order.
-  return s
-    .split(" ")
-    .map((word) => [...word].reverse().join(""))
-    .join("\u00A0"); // a plain space between Hebrew words collapses to nothing
-};
 
 // Size tiers for the group name, by total length and by its longest word
 // (a word can't wrap, so it must fit one 1040px line on its own). The
@@ -212,10 +215,16 @@ export interface CardContent {
   inviter: string; // "" when unknown
   groupName: string;
   badge: string | null;
+  // Right-to-left names, already drawn (rtl.mts), in place of the text.
+  inviterImage?: TextImage;
+  groupImage?: TextImage;
 }
 
+const textImage = (image: TextImage, style: Record<string, unknown> = {}): CardNode =>
+  el("img", { src: image.src, width: image.width, height: image.height, style });
+
 export const buildCard = (
-  { inviter, groupName, badge }: CardContent,
+  { inviter, groupName, badge, inviterImage, groupImage }: CardContent,
   art: { background: string; wordmark: string },
 ): CardNode => {
   const lead = inviter ? "invited you to join" : "You’re invited to join";
@@ -261,6 +270,7 @@ export const buildCard = (
             {
               style: {
                 display: "flex",
+                alignItems: "center",
                 fontSize: inviterLineSize(`${inviter} ${lead}`),
                 letterSpacing: "-0.015em",
                 whiteSpace: "nowrap",
@@ -268,12 +278,16 @@ export const buildCard = (
             },
             inviter
               ? [
-                  el("div", { style: { fontWeight: 800, marginRight: "0.28em" } }, inviter),
+                  inviterImage
+                    ? textImage(inviterImage, { marginRight: "0.22em" })
+                    : el("div", { style: { fontWeight: 800, marginRight: "0.28em" } }, inviter),
                   el("div", { style: { fontWeight: 600, color: WHITE_SECONDARY } }, lead),
                 ]
               : [el("div", { style: { fontWeight: 600, color: WHITE_SECONDARY } }, lead)],
           ),
-          el(
+          groupImage
+            ? textImage(groupImage, { marginTop: 4 })
+            : el(
             "div",
             {
               style: {
@@ -329,18 +343,40 @@ export const buildCard = (
 /**
  * PNG bytes of the card, or null when the names can't be drawn — the
  * caller then serves the static card instead of an image with missing
- * glyphs. Characters Manrope lacks (Japanese, Arabic, Hebrew…) are drawn
- * in the script's Noto Sans (fallback-fonts.mts); null only when that
- * font can't be loaded.
+ * glyphs. Characters Manrope lacks (Japanese, Korean, Thai…) are drawn
+ * in the script's Noto Sans (fallback-fonts.mts). Right-to-left names
+ * (Arabic, Hebrew…) are drawn by resvg in Noto Sans too (rtl.mts). Null
+ * only when such a font can't be loaded, or nothing drawable is left.
  */
 export const renderInviteCard = async (content: {
   groupName: string;
   inviterFirstName: string | null;
   badge: string | null;
 }): Promise<Uint8Array | null> => {
-  const groupName = visualOrder(cardText(content.groupName));
-  const inviter = visualOrder(cardText(content.inviterFirstName));
-  if (!groupName || inviter === null) return null;
+  const groupName = cardText(content.groupName);
+  const inviter = cardText(content.inviterFirstName);
+  if (!groupName) return null;
+
+  // Right-to-left names are drawn by resvg, not Satori (see rtl.mts).
+  const lead = inviter ? "invited you to join" : "";
+  let inviterImage: TextImage | undefined;
+  let groupImage: TextImage | undefined;
+  if (isRtl(groupName) || isRtl(inviter)) {
+    await ensureResvg();
+    const manrope = new Uint8Array(readAsset(ASSETS.fontExtraBold));
+    const draw = (text: string, fontSize: number, maxWidth: number) =>
+      drawRtlText(text, { fontSize, weight: 800, color: "#FFFFFF", maxWidth, manrope, draw: drawSvgText });
+    if (isRtl(groupName)) {
+      const image = await draw(groupName, groupNameStyle(groupName, Boolean(content.badge)).fontSize, CARD_WIDTH - 160);
+      if (!image) return null;
+      groupImage = image;
+    }
+    if (isRtl(inviter)) {
+      const image = await draw(inviter, inviterLineSize(`${inviter} ${lead}`), 520);
+      if (!image) return null;
+      inviterImage = image;
+    }
+  }
 
   // Satori asks for extra fonts only when a character is missing from
   // Manrope: answer with the script's Noto Sans, and treat a font we
@@ -348,7 +384,7 @@ export const renderInviteCard = async (content: {
   let missingGlyphs = false;
   const svg = await satori(
     buildCard(
-      { inviter, groupName, badge: content.badge },
+      { inviter, groupName, badge: content.badge, inviterImage, groupImage },
       { background: await loadBackground(), wordmark: loadWordmark() },
     ) as never,
     {
