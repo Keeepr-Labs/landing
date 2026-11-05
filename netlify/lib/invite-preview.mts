@@ -24,7 +24,8 @@ export const OG_IMAGE_DESIGN_VERSION = "2";
 
 // Output clamps. The backend also clamps server-side, so these are
 // belt-and-suspenders for unexpected input.
-const TITLE_MAX = 60;
+// Messages shows two lines of title, WhatsApp the whole of it.
+const TITLE_MAX = 90;
 const DESCRIPTION_MAX = 155;
 
 // Mirrors of the backend validators: anything else can't match a row, so
@@ -109,29 +110,30 @@ export const escapeHtml = (s: string): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-const clamp = (s: string, max: number): string =>
-  s.length <= max ? s : s.slice(0, max - 1) + "…";
+// Counts code points, so an emoji is never cut in half.
+const clamp = (s: string, max: number): string => {
+  const chars = [...s];
+  return chars.length <= max ? s : chars.slice(0, max - 1).join("") + "…";
+};
 
-// Title leans into the social signal — the inviter and the group, in that
-// order. When the inviter is unknown (e.g., URL missing `i=` or the lookup
-// failed gracefully), fall back to a passive but still personal framing
-// that keeps the "invitation" word doing the emotional work.
-//
-// The group name is wrapped in hyphens so it reads as a distinct entity
-// regardless of how the user capitalized it. Without the brackets, a name
-// like "link test" can blend into the surrounding sentence and lose its
-// identity ("Fernando invited you to join link test" → which words are
-// the group?).
+// Title: who invited you, to which group, and what the group is for. The
+// group name runs in the sentence, set off by the comma before the
+// suffix, and the suffix says what the group is for. The suffix never gets
+// cut: a long group name is shortened instead. It says "a" rather than
+// "his" or "her" because we don't know the inviter's pronouns. When the
+// inviter is unknown (URL missing `i=`, or the lookup failed), the title
+// falls back to a passive framing.
+const TITLE_SUFFIX = ", a workout accountability group 💪";
+
 export const buildTitle = (data: InvitePreview): string | null => {
   if (!data.groupName) return null;
-  const wrappedGroup = `-${data.groupName}-`;
-  if (data.inviterFirstName) {
-    return clamp(
-      `${data.inviterFirstName} invited you to join ${wrappedGroup}`,
-      TITLE_MAX,
-    );
-  }
-  return clamp(`You're invited to join ${wrappedGroup}`, TITLE_MAX);
+  const lead = data.inviterFirstName
+    ? `${data.inviterFirstName} invited you to join `
+    : "You're invited to join ";
+  const room = TITLE_MAX - lead.length - TITLE_SUFFIX.length;
+  // A first name long enough to leave no room for the group: plain clamp.
+  if (room < 8) return clamp(`${lead}${data.groupName}${TITLE_SUFFIX}`, TITLE_MAX);
+  return `${lead}${clamp(data.groupName, room)}${TITLE_SUFFIX}`;
 };
 
 // Description is the brand's stated reason for existing. Same across every
