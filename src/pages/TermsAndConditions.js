@@ -9,172 +9,323 @@ function TermsAndConditions() {
         <div className="logo-container">
           <Link to="/">
             <div className="logo-wrapper">
-              <img 
-                src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'} 
-                alt="Logo" 
-                className="logo" 
+              <img
+                src={process.env.PUBLIC_URL + '/images/LogoWhite.svg'}
+                alt="Logo"
+                className="logo"
               />
             </div>
           </Link>
         </div>
-        
-        <h1 className="policy-title">Terms of Service</h1>
-        
+
+        <h1 className="policy-title">Terms of Use</h1>
+
         <div className="policy-container">
-          <p className="last-updated">Effective Date: January 1, 2024</p>
-          
+          <p className="last-updated">Last updated: November 8, 2026</p>
+
           <section className="policy-section">
-            <h2>1. Introduction</h2>
+            <h2>1. About these Terms</h2>
             <p>
-              These Terms and Conditions ("Terms") govern your use of Keeep, also known as getKeeep ("App"). By using the App, you agree to be bound by these Terms of Service. You must meet the minimum age requirement to use the App, as defined by the laws of your country.
+              These Terms of Use ("Terms") are an agreement between you and DINOSAURFORMULA UNIPESSOAL, LDA, a private limited company
+              registered in Portugal under number (NIPC) 518688445, with its registered office at Calçada do Tijolo, n.º 39, 2 E,
+              1200-464 Lisboa, Portugal ("Keeep", "we", "us"). They cover the Keeep app and getkeeep.com (together, the "Service").
             </p>
             <p>
-              The App is a global platform operating through servers located in various countries, including the United States. If you live in a country with data protection laws, the storage of your personal data may not provide you with the same protections as you enjoy in your country of residence.
+              By creating an account, starting a free trial, buying a membership or otherwise using the Service, you agree to these Terms
+              and confirm that you have read our <Link to="/privacy-policy">Privacy Policy</Link>. If you don't agree, don't use the Service.
             </p>
             <p>
-              Our messaging features are powered by Stream, a third-party service provider. By using our chat functionality, you agree to comply with Stream's Terms of Service, Privacy Policy, and any other applicable legal agreements provided by Stream. These documents govern your use of Stream's services and are available for review at <a href="https://getstream.io/legal/" target="_blank" rel="noopener noreferrer">https://getstream.io/legal/</a>. In the event of a conflict between our terms and Stream's terms, Stream's terms shall govern with respect to the messaging functionality.
+              <strong>If you live in the United States, section 16 contains a binding arbitration agreement and a class action waiver that
+              affect how disputes are resolved. Please read it.</strong>
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>2. User Content and Conduct</h2>
+            <h2>2. Who can use Keeep</h2>
             <p>
-              You are solely responsible for the content you upload, post, or transmit through the App ("Your Content").
-            </p>
-            <p>
-              Your Content must comply with Stream's Acceptable Use Policy and Terms of Service, which prohibit illegal activity, harmful content, infringement of third-party rights, offensive material, spam, and other inappropriate conduct. The App may use automated abuse detection mechanisms to detect harmful content and reserves the right to screen, monitor, and remove any content that violates these Terms.
+              You must be at least 13 years old, and old enough to agree to these Terms where you live. If you are under the age of majority
+              where you live, a parent or guardian must agree to these Terms for you and is responsible for your use, including purchases.
+              You must give us accurate information, use a phone number you control, and keep your device and account secure. You are
+              responsible for everything done through your account.
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>3. Messaging and Communication</h2>
+            <h2>3. What Keeep is, and what it is not</h2>
             <p>
-              Our messaging features are powered by Stream, a third-party service provider. By using our chat functionality, you agree to comply with Stream's Terms of Service, Privacy Policy, and any other applicable legal agreements provided by Stream. These documents govern your use of Stream's services and are available for review at <a href="https://getstream.io/legal/" target="_blank" rel="noopener noreferrer">https://getstream.io/legal/</a>. In the event of a conflict between our terms and Stream's terms, Stream's terms shall govern with respect to the messaging functionality.
+              Keeep lets you form small groups, set a shared fitness goal, chat, and log workouts, which can be verified with Apple Health.
+              Groups have a limited number of spots; when a group is full, a new member may need to wait for a spot, ask the host, or start
+              a new group.
             </p>
             <p>
-              We are not responsible for the availability, performance, or functionality of Stream's services, and you acknowledge and agree that Stream is solely responsible for the messaging functionality and any issues related to their platform. We disclaim all liability related to the use of Stream's services, including any failure or interruption of the messaging functionality.
-            </p>
-            <p>
-              The App may provide features to inform contacts about the App or share your information with others. You are responsible for ensuring you have the right to provide any contact information.
-            </p>
-            <p>
-              In accordance with Stream's functionality and policies user message history is stored on the user's device, while limited technical information necessary for message transmission is stored on Stream's servers.
+              <strong>Keeep is not a medical, health or fitness professional service, and nothing in it is medical advice.</strong> Talk to
+              a doctor before starting or changing an exercise programme, especially if you have a health condition, are pregnant, or have
+              not exercised in a while. Stop and seek help if you feel pain, faintness or shortness of breath. You exercise at your own risk
+              and are responsible for choosing activities that are safe for you. Workout and step data come from Apple Health and the apps
+              and devices that feed it, and may be incomplete or inaccurate.
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>4. Third-Party Services</h2>
+            <h2>4. Memberships, free trials and billing</h2>
             <p>
-              The App may contain links to third-party websites or resources shared by other users in users communications. The App is not responsible for the availability, accuracy, or content of these third-party services. You use them at your own risk.
+              <strong>Plans.</strong> Keeep requires a membership. We offer monthly and yearly memberships that renew automatically, and a
+              lifetime membership paid once. The plans, prices (including taxes where applicable) and any free trial are shown in the app
+              before you buy, and may differ by country and over time.
             </p>
             <p>
-              If you use any third-party integrations within the app (e.g., fitness trackers like Strava), you will be subject to the third-party's terms of service.
+              <strong>Apple is the seller.</strong> All purchases are made through your Apple ID and processed by Apple under the Apple
+              Media Services Terms and Conditions. We never receive your card details.
             </p>
             <p>
-              If you choose to make in-app purchases, you agree that additional terms may apply and payments will be processed through third-party payment methods.
+              <strong>Automatic renewal.</strong> Monthly and yearly memberships renew automatically at the end of each period, and Apple
+              charges your Apple ID at the then-current price, unless you turn off auto-renew at least 24 hours before the period ends.
+              You can manage or cancel in iPhone Settings, your name, Subscriptions. Deleting the app or your Keeep account does not cancel
+              a subscription. When you cancel, you keep access until the end of the period you paid for.
+            </p>
+            <p>
+              <strong>Free trials.</strong> Some plans include a free trial, shown before you start it. Unless you cancel at least 24 hours
+              before the trial ends, the membership starts and Apple charges you automatically when the trial ends. Each person may use a
+              free trial only once, as Apple's rules determine.
+            </p>
+            <p>
+              <strong>Lifetime membership.</strong> A lifetime membership is a one-time purchase that gives the buyer access to Keeep's
+              membership features for as long as Keeep offers the Service. It covers only the person who bought it.
+            </p>
+            <p>
+              <strong>Late-join fee.</strong> Joining a group's round after it has started may require a one-time fee, shown before you pay.
+            </p>
+            <p>
+              <strong>Price changes.</strong> We may change prices. Changes to a subscription you already have take effect at your next
+              renewal, after Apple notifies you and, where the law or Apple's rules require it, asks for your consent.
+            </p>
+            <p>
+              <strong>Refunds.</strong> Because Apple processes payments, refund requests go to Apple at
+              {' '}<a href="https://reportaproblem.apple.com" target="_blank" rel="noopener noreferrer">reportaproblem.apple.com</a>.
+              We cannot issue refunds for App Store purchases. Except where the law requires otherwise, payments are not refundable and we
+              do not give credit for partly used periods.
+            </p>
+            <p>
+              <strong>EU and UK consumers.</strong> You get immediate access to digital content when your purchase is confirmed. By buying,
+              you ask for that access to start straight away, and you acknowledge that you lose your 14-day right of withdrawal once it has
+              started, as the law allows. Your statutory rights otherwise remain unaffected.
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>5. In-App Purchases</h2>
+            <h2>5. Invite coupons</h2>
             <p>
-              This section outlines the terms and conditions that apply when you choose to make purchases within the App ("In-App Purchases"). By making an In-App Purchase, you agree to these terms.
-            </p>
-            <p>
-              <strong>Payment Methods:</strong> The App may offer various payment methods for In-App Purchases, such as credit cards, debit cards, and third-party payment platforms like Google Pay or Apple Pay. The availability of specific payment methods may vary depending on your location and other factors. We use third-party payment processors to handle transactions. You authorize us to charge your chosen payment method for the price of the In-App Purchase. You are responsible for any fees charged by your payment provider related to the transaction, including but not limited to foreign transaction fees.
-            </p>
-            <p>
-              <strong>Refunds:</strong> All In-App Purchases are final and non-refundable, except as required by law or as otherwise stated in these Terms. We may, at our sole discretion, choose to offer refunds for certain In-App Purchases under specific circumstances. However, we are not obligated to provide a refund for any reason. If you believe you are entitled to a refund for an In-App Purchase, please contact our customer support team. We will review your request and make a decision based on our refund policy and applicable laws.
-            </p>
-            <p>
-              <strong>Virtual Items:</strong> The App may offer virtual items for purchase("Virtual Items"). Virtual Items represent a limited, non-transferable license to use the item within the App. You do not own the Virtual Items, and they have no monetary value outside of the App. We may modify or remove Virtual Items at our discretion, and we are not obligated to provide any compensation for unused Virtual Items if the App or your account is terminated. All purchases of Virtual Items are final and non-refundable.
-            </p>
-            <p>
-              <strong>Third-Party Payment Platforms:</strong> If you download the App through a third-party app store (like Apple App Store or Google Play Store), their terms and conditions, including payment policies, may also apply to your In-App Purchases. Please review the third-party platform's terms and conditions before making any In-App Purchases.
+              Some invites include a coupon, such as a free trial period, given by the person who invited you. Each coupon can be used once,
+              by the first eligible person who claims it. A coupon is held for you while your free trial runs, is used when your first
+              payment goes through, and is released if your trial ends without payment, you cancel before the first charge, or the purchase
+              is refunded or not completed. Coupons have no cash value, cannot be sold, transferred or exchanged, and may expire. We may
+              cancel coupons that were obtained by fraud, automation, multiple accounts or in breach of these Terms, and may change or end
+              the coupon programme at any time without affecting coupons already used.
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>6. Disclaimer of Warranties and Limitation of Liability</h2>
+            <h2>6. Your content</h2>
             <p>
-              The App and its services are provided "as is" and "as available" without any warranty, express or implied. The App does not guarantee that the services will be uninterrupted, secure, or error-free.
+              You keep ownership of the messages, photos and other content you share ("Your Content"). You give us a worldwide,
+              non-exclusive, royalty-free licence to host, store, copy, process, display and transmit Your Content only as needed to run,
+              secure and improve the Service and to show it to the people you share it with. This licence ends when Your Content is deleted
+              from the Service, except for copies we must keep by law or that others have already received.
             </p>
             <p>
-              The App's liability is limited as outlined in Stream's Terms and Conditions.
+              You are responsible for Your Content and confirm that you have the rights to share it. Content you post in a group can be seen,
+              saved and shared by its members, and we cannot control what they do with it.
             </p>
           </section>
-          
+
           <section className="policy-section">
-            <h2>7. Indemnity</h2>
-            <p>
-              You agree to indemnify the App from any claims arising from your use of the App, Your Content, or violation of these Terms.
-            </p>
-          </section>
-          
-          <section className="policy-section">
-            <h2>8. Term and Termination</h2>
-            <p>
-              These Terms commence upon your use of the App and continue until terminated in accordance with these Terms and Stream's Terms of Service.
-            </p>
-            <p>
-              You may terminate your account at any time by deleting the App. To delete your account information please contact the email address provided at the end of this document.
-            </p>
-            <p>
-              The App may suspend or terminate your account for violations of these Terms or other inappropriate conduct, as outlined in Stream's Terms and Conditions. Appeals processes may be available in certain circumstances.
-            </p>
-          </section>
-          
-          <section className="policy-section">
-            <h2>9. Data Collection Transparency and Data Use Disclosure</h2>
-            <p><strong>Data Collection:</strong> The App collects the following types of data for the purposes described below:</p>
+            <h2>7. Rules of conduct</h2>
+            <p>You agree not to:</p>
             <ul>
-              <li>Account Information: Name, email address and any information obtained from the social login provider selected by the user. Any of this information is exclusively accessible according users own set preferences with said provider. This is collected for account creation, authentication and communication.</li>
-              <li>Usage Data: App usage, features accessed and interactions with content. This is collected to analyze app performance, improve functionality, and improving the users experience.</li>
-              <li>Device Information: The timezone where the device is used and the devices operating system are collected. This is collected for technical diagnostics and for improvement of the users experience where the localized time is relevant in the App use.</li>
+              <li>post anything illegal, threatening, harassing, hateful, sexually explicit, violent, or that infringes someone else's rights;</li>
+              <li>impersonate anyone, or invite people without their permission or in a way that amounts to spam;</li>
+              <li>fake, alter or misrepresent workouts or health data;</li>
+              <li>abuse free trials, coupons, invites or referrals, including through multiple or fake accounts;</li>
+              <li>reverse engineer, scrape, overload, or interfere with the Service, or access it by automated means;</li>
+              <li>use the Service for commercial purposes without our written permission;</li>
+              <li>help or encourage anyone else to do any of these things.</li>
             </ul>
-            
-            <p><strong>Data Use:</strong> The App uses the collected data for the following purposes:</p>
-            <ul>
-              <li>Providing and improving the App's functionalities.</li>
-              <li>Improving user experience.</li>
-              <li>Facilitating communication between users.</li>
-              <li>Displaying targeted advertising on third party websites and services.</li>
-              <li>Analyzing app usage and performance.</li>
-              <li>Ensuring the security and integrity of the App.</li>
-            </ul>
-            
-            <p><strong>Data Retention:</strong> We retain your data for as long as necessary to provide you with the App's services and for legitimate business purposes, such as fraud prevention and security. We may also retain your data to comply with legal obligations, resolve disputes, and enforce our agreements.</p>
-            
-            <p><strong>Legal Basis for Processing:</strong> We process your data based on your consent, contractual necessity, or our legitimate interests. You can withdraw your consent at any time through the by contacting us.</p>
-          </section>
-          
-          <section className="policy-section">
-            <h2>10. Miscellaneous</h2>
-            <ul>
-              <li>The App may modify these Terms at any time. Continued use of the App constitutes your acceptance of any changes.</li>
-              <li>These Terms constitute the entire agreement between you and the App.</li>
-              <li>Any provision of these Terms found invalid shall be severed, and the remainder of the Terms shall remain in effect.</li>
-              <li>The relationship between you and the App is that of independent contractors.</li>
-              <li>The App reserves the right to transfer or assign these Terms without restriction.</li>
-            </ul>
-          </section>
-          
-          <section className="policy-section">
-            <h2>11. Contact</h2>
             <p>
-              For questions, complaints, or claims, please contact: <a href="mailto:help@getkeeep.com">help@getkeeep.com</a>
+              We may review, remove or restrict content, and limit, suspend or close accounts, when we reasonably believe these Terms or the
+              law have been broken. You can report content or users to <a href="mailto:help@getkeeep.com">help@getkeeep.com</a>.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>8. Contacts and invites</h2>
+            <p>
+              When you invite people, you confirm that you know them and that they would welcome the invite. Standard carrier rates for
+              messages sent from your phone may apply.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>9. Our rights</h2>
+            <p>
+              The Service, including its software, design, text, graphics and the Keeep name and logo, belongs to us or our licensors. We
+              give you a personal, revocable, non-exclusive, non-transferable licence to use the app on Apple devices you own or control, for
+              your own non-commercial use, under these Terms and Apple's usage rules. If you send us feedback or ideas, we may use them freely
+              without paying you.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>10. Third-party services</h2>
+            <p>
+              The Service relies on services from other companies, such as Apple (App Store and Apple Health), and may link to other
+              websites. We are not responsible for third-party services or content, and your use of them is governed by their own terms.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>11. Changes to the Service and these Terms</h2>
+            <p>
+              We may add, change or remove features, or stop offering the Service, to improve it, for legal, security or technical reasons,
+              or for business reasons. If we stop offering the Service entirely, we will give reasonable notice where possible. We may update
+              these Terms. If a change is significant, we will tell you in the app or by another reasonable means at least 15 days before it
+              takes effect. If you keep using the Service after that, you accept the new Terms; if you don't agree, stop using the Service and
+              cancel your subscription.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>12. Ending your account</h2>
+            <p>
+              You can delete your account at any time in the app, under Settings. Remember to cancel any subscription with Apple separately.
+              We may suspend or close your account, with notice where reasonable, if you break these Terms, if required by law, or to protect
+              users or the Service. Sections that by their nature should continue after your account ends (including 6, 9, 13, 14, 15 and 16)
+              will continue.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>13. Disclaimers</h2>
+            <p>
+              To the fullest extent permitted by law, the Service is provided "as is" and "as available", without warranties of any kind,
+              whether express or implied, including warranties of merchantability, fitness for a particular purpose, accuracy and
+              non-infringement. We do not promise that the Service will be uninterrupted, error-free or secure, that it will help you reach
+              any fitness or health result, or that other users will behave in any particular way. We are not responsible for the conduct of
+              users, on or off the Service.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>14. Limitation of liability</h2>
+            <p>
+              To the fullest extent permitted by law, Keeep and its directors, employees and suppliers will not be liable for any indirect,
+              incidental, special, consequential, exemplary or punitive damages, or for loss of profits, revenue, data, goodwill, or for
+              any injury arising from physical activity, whatever the legal theory, even if we were told such damage was possible.
+            </p>
+            <p>
+              To the fullest extent permitted by law, our total liability for all claims relating to the Service is limited to the greater
+              of the amount you paid for Keeep in the 12 months before the claim arose, or EUR 50.
+            </p>
+            <p>
+              Nothing in these Terms limits or excludes liability that cannot be limited or excluded by law, including liability for death
+              or personal injury caused by our negligence, for fraud, or for wilful misconduct or gross negligence. If you are a consumer in
+              the European Union or the United Kingdom, you also keep the mandatory rights the law gives you, and these Terms do not take them
+              away.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>15. Indemnity</h2>
+            <p>
+              To the extent permitted by law, you agree to defend, indemnify and hold harmless Keeep and its directors, employees and
+              suppliers from claims, losses and costs (including reasonable legal fees) that arise from Your Content, your misuse of the
+              Service, or your breach of these Terms or of the law. This section does not apply to consumers where the law does not allow it.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>16. Governing law and disputes</h2>
+            <p>
+              <strong>Talk to us first.</strong> Most problems can be solved quickly. Before starting any claim, please write to
+              {' '}<a href="mailto:help@getkeeep.com">help@getkeeep.com</a> with a description of the problem, and give us 30 days to try to
+              resolve it.
+            </p>
+            <p>
+              <strong>Governing law.</strong> These Terms are governed by the laws of Portugal. If you are a consumer, this does not take
+              away the protection of the mandatory laws of the country where you live.
+            </p>
+            <p>
+              <strong>Courts.</strong> The courts of Lisbon, Portugal, have jurisdiction over any dispute, except that if you are a consumer
+              living in the European Union or the United Kingdom, you may also bring a claim in the courts of the country where you live.
+            </p>
+            <p>
+              <strong>Consumer dispute resolution in Portugal.</strong> If we cannot resolve a dispute, you may use an alternative consumer
+              dispute resolution entity, such as the Centro Nacional de Informação e Arbitragem de Conflitos de Consumo
+              (CNIACC, <a href="https://www.cniacc.pt" target="_blank" rel="noopener noreferrer">www.cniacc.pt</a>). More entities are listed
+              at <a href="https://www.consumidor.gov.pt" target="_blank" rel="noopener noreferrer">www.consumidor.gov.pt</a>. You may also
+              file a complaint in the electronic complaints book
+              at <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener noreferrer">www.livroreclamacoes.pt</a>.
+            </p>
+            <p>
+              <strong>Arbitration for users in the United States.</strong> If you live in the United States, you and Keeep agree to resolve
+              any dispute relating to the Service or these Terms by final and binding individual arbitration administered by the American
+              Arbitration Association under its Consumer Arbitration Rules, instead of in court, except that either party may bring an
+              individual claim in small claims court, and either party may seek an injunction in court to stop infringement of intellectual
+              property. The arbitration will take place in the county where you live or by video, and the Federal Arbitration Act governs this
+              agreement. <strong>You and Keeep each waive the right to a jury trial and to take part in a class action, class arbitration or
+              representative action.</strong> If this class waiver is found unenforceable for a claim, that claim must be heard in court and
+              this arbitration agreement does not apply to it. You may opt out of this arbitration agreement by emailing
+              {' '}<a href="mailto:help@getkeeep.com">help@getkeeep.com</a> within 30 days of first accepting these Terms, with your name,
+              phone number and a clear statement that you opt out.
+            </p>
+            <p>
+              <strong>Time limit.</strong> To the extent permitted by law, any claim must be brought within one year after it arose.
+            </p>
+          </section>
+
+          <section className="policy-section">
+            <h2>17. Apple</h2>
+            <p>If you got the app from Apple's App Store, you and we also agree that:</p>
+            <ul>
+              <li>these Terms are between you and Keeep, not Apple, and Keeep, not Apple, is responsible for the app and its content;</li>
+              <li>Apple has no obligation to provide maintenance or support for the app;</li>
+              <li>if the app fails to meet an applicable warranty, you may notify Apple, and Apple will refund the purchase price, if any; to the extent permitted by law, Apple has no other warranty obligation for the app;</li>
+              <li>Keeep, not Apple, is responsible for handling any claims about the app, including product liability claims, claims that it fails to meet legal or regulatory requirements, and consumer protection, privacy or similar claims;</li>
+              <li>Keeep, not Apple, is responsible for investigating, defending and settling any claim that the app infringes someone's intellectual property rights;</li>
+              <li>you confirm that you are not located in a country subject to a U.S. Government embargo or designated as a "terrorist supporting" country, and are not on any U.S. Government list of prohibited or restricted parties;</li>
+              <li>Apple and its subsidiaries are third-party beneficiaries of these Terms and may enforce them against you.</li>
+            </ul>
+            <p>Apple's standard Licensed Application End User License Agreement also applies to your use of the app, and these Terms add to it.</p>
+          </section>
+
+          <section className="policy-section">
+            <h2>18. General</h2>
+            <ul>
+              <li>These Terms and the Privacy Policy are the entire agreement between you and us about the Service.</li>
+              <li>If any part of these Terms is found unenforceable, the rest stays in effect, and that part is applied to the fullest extent allowed.</li>
+              <li>If we don't enforce a right, that is not a waiver of it.</li>
+              <li>You may not transfer your rights under these Terms. We may transfer ours to a company that takes over the Service, without reducing your rights.</li>
+              <li>We are not responsible for delays or failures caused by events beyond our reasonable control.</li>
+              <li>These Terms are written in English. If we provide a translation, the English version prevails to the extent permitted by law.</li>
+            </ul>
+          </section>
+
+          <section className="policy-section">
+            <h2>19. Contact</h2>
+            <p>
+              DINOSAURFORMULA UNIPESSOAL, LDA, Calçada do Tijolo, n.º 39, 2 E, 1200-464 Lisboa, Portugal. NIPC 518688445.
+              Email: <a href="mailto:help@getkeeep.com">help@getkeeep.com</a>.
             </p>
           </section>
         </div>
-        
+
         <div className="back-to-home">
           <Link to="/" className="back-link">← Back to Home</Link>
         </div>
       </div>
-      
+
       <footer className="footer">
         <div className="footer-links">
-          <Link to="/terms-of-service" className="footer-link">Terms and Conditions</Link>
+          <Link to="/terms-of-service" className="footer-link">Terms of Use</Link>
           <span className="separator">|</span>
           <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
         </div>
@@ -183,4 +334,4 @@ function TermsAndConditions() {
   );
 }
 
-export default TermsAndConditions; 
+export default TermsAndConditions;
