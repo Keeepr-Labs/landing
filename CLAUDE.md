@@ -9,6 +9,8 @@ Invite link previews: the `/invite` edge function
 (`netlify/edge-functions/invite.ts`) personalizes the page's OG tags and points
 og:image at the `/og/invite` function (`netlify/functions/og-invite/`), which
 draws the invite card PNG. Shared logic lives in `netlify/lib/invite-preview.mts`.
+Both look the group up on the production and staging backends at once (TestFlight
+builds create groups on staging) and use whichever knows it, production first.
 
 ## Deploy Configuration
 
