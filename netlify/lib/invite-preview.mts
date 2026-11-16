@@ -9,10 +9,19 @@
  *   { valid: false }
  * inviterFirstName may be null; nextPayDate ('YYYY-MM-DD', the last day to
  * join) arrives with the v2 backend and is optional here.
+ *
+ * Invites can come from either backend: the App Store app talks to
+ * production, TestFlight builds to staging. Both send the same
+ * getkeeep.com/invite links, and a group exists on only one of them, so
+ * the lookup asks both at once and takes the one that knows the group
+ * (production first). Group ids are random UUIDs, so they never clash.
  */
 
 export const INVITE_PREVIEW_API_URL =
   "https://keeep-9dde9ef1f49f.herokuapp.com/api/public/invite-preview";
+
+export const STAGING_INVITE_PREVIEW_API_URL =
+  "https://keeep-staging-e556699b48e4.herokuapp.com/api/public/invite-preview";
 
 // Path of the preview image function (netlify/functions/og-invite).
 export const OG_IMAGE_PATH = "/og/invite";
@@ -48,10 +57,10 @@ export const normalizeInviterId = (i: string | null): string | null =>
   typeof i === "string" && USER_ID_RE.test(i) ? i : null;
 
 /**
- * API URL, overridable with INVITE_PREVIEW_API_URL for local testing
- * against a mock or local backend. Never set in production.
+ * Override for local testing against a mock or local backend, read from
+ * INVITE_PREVIEW_API_URL. Never set in production. Null when unset.
  */
-export const inviteApiUrl = (): string => {
+const apiUrlOverride = (): string | null => {
   const g = globalThis as {
     Netlify?: { env?: { get(key: string): string | undefined } };
     process?: { env?: Record<string, string | undefined> };
@@ -64,16 +73,50 @@ export const inviteApiUrl = (): string => {
       ? g.Netlify.env?.get("INVITE_PREVIEW_API_URL")
       : g.process?.env?.INVITE_PREVIEW_API_URL;
   } catch {
-    // Deno throws on env reads without permission: use production.
+    // Deno throws on env reads without permission: use the defaults.
   }
-  return override && /^https?:\/\//.test(override)
-    ? override
-    : INVITE_PREVIEW_API_URL;
+  return override && /^https?:\/\//.test(override) ? override : null;
 };
 
 /**
- * Fetch preview data from the backend with a hard timeout. Never throws:
- * returns null on any failure — callers treat null as "no personalization".
+ * Backends to ask, in order of preference: the override alone when set,
+ * otherwise production then staging.
+ */
+export const inviteApiUrls = (): string[] => {
+  const override = apiUrlOverride();
+  return override
+    ? [override]
+    : [INVITE_PREVIEW_API_URL, STAGING_INVITE_PREVIEW_API_URL];
+};
+
+/** The preferred backend (the override, or production). */
+export const inviteApiUrl = (): string => inviteApiUrls()[0];
+
+const fetchFrom = async (
+  apiUrl: string,
+  c: string,
+  i: string | null,
+  signal: AbortSignal,
+): Promise<InvitePreview | null> => {
+  try {
+    const url = new URL(apiUrl);
+    url.searchParams.set("c", c);
+    if (i) url.searchParams.set("i", i);
+    const res = await fetch(url.toString(), { signal });
+    if (!res.ok) return null;
+    const body = (await res.json()) as InvitePreview;
+    return body && typeof body.valid === "boolean" ? body : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Fetch preview data from the backends with one hard timeout for all of
+ * them. Never throws. Returns the first backend's valid answer in
+ * preference order; when none knows the group, the first answer that came
+ * back at all ({ valid: false }); null when every lookup failed. Callers
+ * treat anything but a valid answer as "no personalization".
  */
 export const fetchInvitePreview = async (
   c: string,
@@ -83,15 +126,12 @@ export const fetchInvitePreview = async (
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const url = new URL(inviteApiUrl());
-    url.searchParams.set("c", c);
-    if (i) url.searchParams.set("i", i);
-    const res = await fetch(url.toString(), { signal: controller.signal });
-    if (!res.ok) return null;
-    const body = (await res.json()) as InvitePreview;
-    return body && typeof body.valid === "boolean" ? body : null;
-  } catch {
-    return null;
+    const answers = await Promise.all(
+      inviteApiUrls().map((u) => fetchFrom(u, c, i, controller.signal)),
+    );
+    return (
+      answers.find((a) => a?.valid) ?? answers.find((a) => a !== null) ?? null
+    );
   } finally {
     clearTimeout(timer);
   }

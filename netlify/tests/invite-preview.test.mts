@@ -8,6 +8,7 @@ import {
   fetchInvitePreview,
   imageOrigin,
   INVITE_PREVIEW_API_URL,
+  STAGING_INVITE_PREVIEW_API_URL,
   inviteApiUrl,
   joinByLabel,
   previewVersion,
@@ -282,18 +283,68 @@ describe("fetchInvitePreview", () => {
     globalThis.fetch = realFetch;
   });
 
-  it("asks the backend with c and i and returns its body", async () => {
-    let requested = "";
+  const base = (u: string) => {
+    const url = new URL(u);
+    return url.origin + url.pathname;
+  };
+
+  it("asks production and staging with c and i, and prefers production", async () => {
+    const requested: string[] = [];
     globalThis.fetch = (async (input: string) => {
-      requested = input;
-      return Response.json({ valid: true, groupName: "Run Club", inviterFirstName: "Maria" });
+      requested.push(input);
+      return Response.json({
+        valid: true,
+        groupName: base(input) === INVITE_PREVIEW_API_URL ? "Run Club" : "Staging Club",
+        inviterFirstName: "Maria",
+      });
     }) as typeof fetch;
     const data = await fetchInvitePreview(CONVO, INVITER, 1000);
     assert.deepEqual(data, { valid: true, groupName: "Run Club", inviterFirstName: "Maria" });
-    const url = new URL(requested);
-    assert.equal(url.origin + url.pathname, INVITE_PREVIEW_API_URL);
-    assert.equal(url.searchParams.get("c"), CONVO);
-    assert.equal(url.searchParams.get("i"), INVITER);
+    assert.deepEqual(requested.map(base).sort(), [INVITE_PREVIEW_API_URL, STAGING_INVITE_PREVIEW_API_URL].sort());
+    for (const r of requested) {
+      const url = new URL(r);
+      assert.equal(url.searchParams.get("c"), CONVO);
+      assert.equal(url.searchParams.get("i"), INVITER);
+    }
+  });
+
+  it("finds a group that only staging knows (TestFlight invites)", async () => {
+    globalThis.fetch = (async (input: string) =>
+      base(input) === STAGING_INVITE_PREVIEW_API_URL
+        ? Response.json({ valid: true, groupName: "No Flake Zone", inviterFirstName: "Sam" })
+        : Response.json({ valid: false })) as typeof fetch;
+    assert.deepEqual(await fetchInvitePreview(CONVO, INVITER, 1000), {
+      valid: true,
+      groupName: "No Flake Zone",
+      inviterFirstName: "Sam",
+    });
+  });
+
+  it("still finds the group when one backend is down", async () => {
+    globalThis.fetch = (async (input: string) =>
+      base(input) === INVITE_PREVIEW_API_URL
+        ? new Response("oops", { status: 503 })
+        : Response.json({ valid: true, groupName: "Run Club", inviterFirstName: null })) as typeof fetch;
+    assert.deepEqual(await fetchInvitePreview(CONVO, null, 1000), {
+      valid: true,
+      groupName: "Run Club",
+      inviterFirstName: null,
+    });
+  });
+
+  it("asks only the override when INVITE_PREVIEW_API_URL is set", async () => {
+    const requested: string[] = [];
+    process.env.INVITE_PREVIEW_API_URL = "http://localhost:8787/api/public/invite-preview";
+    try {
+      globalThis.fetch = (async (input: string) => {
+        requested.push(input);
+        return Response.json({ valid: false });
+      }) as typeof fetch;
+      await fetchInvitePreview(CONVO, null, 1000);
+    } finally {
+      delete process.env.INVITE_PREVIEW_API_URL;
+    }
+    assert.deepEqual(requested.map(base), ["http://localhost:8787/api/public/invite-preview"]);
   });
 
   it("returns null on HTTP errors, bad JSON and unexpected bodies", async () => {
